@@ -1,0 +1,189 @@
+man cp
+
+NOM
+
+       cp - Copier des fichiers et des répertoires
+
+SYNOPSIS
+
+       cp [OPTION]... [-T] SOURCE CIBLE
+       cp [OPTION]... SOURCE... RÉPERTOIRE
+       cp [OPTION]... -t RÉPERTOIRE SOURCE...
+
+       Copier  la  SOURCE  vers  la  CIBLE,  ou  de  multiples SOURCEs vers le
+       RÉPERTOIRE.
+
+       Les paramètres obligatoires pour les options de forme  longue  le  sont
+       aussi pour les options de forme courte.
+
+       -a, --archive
+              identique à -dR --preserve=all
+
+       --backup[=MODE]
+              archiver chaque fichier cible existant
+
+       -b     identique à --backup mais sans paramètre
+
+       --copy-contents
+              copier le contenu des fichier spéciaux en mode récursif
+
+       -d     identique à --no-dereference --preserve=links
+
+       -f, --force
+              si  un  fichier  cible  existe  et  ne peut être ouvert alors le
+              détruire et essayer à nouveau  (redondant  si  l’option  -n  est
+              utilisée)
+
+       -i, --interactive
+              demander  confirmation  avant  d’écraser  (annule une précédente
+              option -n)
+
+       -H     suivre les liens symboliques fournis en ligne de  commande  dans
+              SOURCE
+
+       -l, --link
+              lier les fichiers au lieu de les copier
+
+       -L, --dereference
+              toujours suivre les liens symboliques dans SOURCE
+
+       -n, --no-clobber
+              ne pas écraser un fichier existant (annule une précédente option
+              -i)
+
+       -P, --no-dereference
+              ne jamais suivre les liens symboliques dans SOURCE
+
+       -p     identique à --preserve=mode,ownership,timestamps
+
+       --preserve[=LISTE_ATTR]
+              préserver    les    attributs    spécifiés     (par     défaut :
+              mode,ownership,timestamps),   et   si   possible  les  attributs
+              supplémentaires : context, links, xattr, all
+
+       --no-preserve=LISTE_ATTR
+              ne pas préserver les attributs spécifiques
+
+       --parents
+              accoler le chemin source au répertoire
+
+       -R, -r, --recursive
+              copier récursivement les répertoires
+
+       --reflink[=PARAMTRE]
+              contrôler les copies clone/CoW. Voir ci-dessous.
+
+       --remove-destination
+              enlever chaque fichier cible existant  avant  de  l’ouvrir  (par
+              contraste avec --force)
+
+       --sparse=MODE
+              contrôler le mode de création des fichiers creux (sparse files).
+              Voirci-dessous.
+
+       --strip-trailing-slashes
+              enlever le « / » en suffixe de chaque paramètre SOURCE
+
+       -s, --symbolic-link
+              créer des liens symboliques au lieu de copier
+
+       -S, --suffix=SUFFIXE
+              écraser le suffixe habituel d’archivage avec le SUFFIXE
+
+       -t, --target-directory=RPERTOIRE
+              copier tous les paramètres de la SOURCE dans le RÉPERTOIRE
+
+       -T, --no-target-directory
+              traiter la CIBLE comme un fichier normal
+
+       -u, --update
+              ne copier que si le  fichier  source  est  plus  récent  que  le
+              fichier destination ou si celui-ci n’existe pas
+
+       -v, --verbose
+              expliquer ce qui est fait
+
+       -x, --one-file-system
+              ne pas quitter ce système de fichiers
+
+       --help afficher l’aide-mémoire et quitter
+
+       --version
+              afficher le nom et la version du logiciel et quitter
+
+       Par défaut, les fichiers creux SOURCEs sont détectés par le biais d’une
+       heuristique grossière et  le  fichier  CIBLE  correspondant  est  aussi
+       construit  creux.  Il s’agit d’un comportement sélectionné par l’option
+       --sparse=auto. Spécifiez --sparse=always pour créer  un  fichier  CIBLE
+       creux  lorsque le fichier SOURCE contient de longues séquences d’octets
+       de valeur zéro. Utilisez --sparse=never pour désactiver la création  de
+       fichiers creux.
+
+       Lorsque  --reflink[=always]  est  utilisé,  effectuer une copie légère,
+       c’est-à-dire que les blocs de données ne  sont  copiés  que  lorsqu’ils
+       sont  modifiés.  Si  ce  n’est  pas  possible,  la  copie échoue ou, si
+       --reflink=auto est utilisé, une copie standard est effectuée.
+
+       Le suffixe d’archivage est « ~ », à moins d’avoir été  initialisé  avec
+       --suffix  ou  SIMPLE_BACKUP_SUFFIX.  La  méthode de contrôle de version
+       peut être choisie à l’aide de l’option  --backup  ou  à  l’aide  de  la
+       variable d’environnement VERSION_CONTROL parmi les valeurs suivantes :
+
+       none, off
+              ne jamais archiver (même si --backup est utilisé)
+
+       numbered, t
+              faire des archives numérotées
+
+       existing, nil
+              numéroter si des archives numérotées existent déjà, sinon ne pas
+              numéroter
+
+       simple, never
+              toujours faire des archives de type simple
+
+       Il est à noter  que  « cp »  archive  la  SOURCE  lorsque  les  options
+       « force»  et  « backup »  sont  utilisées  et que la SOURCE et la CIBLE
+       portent le même nom qu’un fichier normal existant.
+
+AUTEUR
+
+       Écrit par Torbjorn Granlund, David MacKenzie et Jim Meyering.
+
+SIGNALER DES BOGUES
+
+       Signaler toute anomalie de cp à bug-coreutils@gnu.org
+       Page          d’accueil          de           GNU           coreutils :
+       <http://www.gnu.org/software/coreutils/>
+       Aide     générale     sur    l’utilisation    des    logiciels    GNU :
+       <http://www.gnu.org/gethelp/>
+       Signaler     toute     erreur     de     traduction     de     cp     à
+       <http://translationproject.org/team/>
+
+COPYRIGHT
+
+       Copyright  ©  2009  Free Software Foundation, Inc. Licence GPLv3+ : GNU
+       GPL version 3 ou supérieures <http://gnu.org/licenses/gpl.html>
+       Ce programme est un logiciel libre.  Vous  pouvez  le  modifier  et  le
+       redistribuer.  Il n’y a AUCUNE GARANTIE dans la mesure autorisée par la
+       loi.
+
+VOIR AUSSI
+
+       La documentation  complète  pour  cp  est  disponible  dans  un  manuel
+       Texinfo.  Si  les programmes info et cp sont correctement installés sur
+       votre système, la commande
+
+              info coreutils 'cp invocation'
+
+       devrait vous donner accès au manuel complet (en anglais).
+
+TRADUCTION
+
+       Cette page de manuel a été traduite par Michel Robitaille <robitail  AT
+       iro  DOT  umontreal  DOT  ca>  et mise à jour pour Debian par Jean-Marc
+       Chaton  <chaton  AT  debian  DOT  org>  et  les  membres  de  la  liste
+       <debian-l10n-french  AT  lists  DOT debian DOT org>.  Veuillez signaler
+       toute erreur de traduction par  un  rapport  de  bogue  sur  le  paquet
+       manpages-fr-extra.
+

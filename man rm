@@ -1,0 +1,127 @@
+man rm 
+
+NOM
+
+       rm - Effacer des fichiers et des répertoires
+
+SYNOPSIS
+
+       rm [OPTION]... FICHIER...
+
+       Cette  page  de  manuel documente la version GNU de rm. Le programme rm
+       efface  chaque  fichier  listé.  Par  défaut,  il  n’efface   pas   les
+       répertoires.
+
+       Si  l’option -I ou --interactive=once est fournie, et qu’il y a plus de
+       trois fichiers  ou  qu’une  des  otpions  -r,  -R  ou  --recursive  est
+       utilisée,   alors  rm  demande  à  l’utilisateur  s’il  faut  effectuer
+       l’opération. Si la réponse  n’est  pas  affirmative,  la  commande  est
+       interrompue.
+
+       Sinon,  si  un  fichier  n’est  pas accessible en écriture, si l’entrée
+       standard est un terminal, et si les options -f et --force ne  sont  pas
+       indiquées,  ou  si l’option -i ou --interactive=always est indiquée, rm
+       demande à l’utilisateur de confirmer l’effacement  du  fichier.  Si  la
+       réponse n’est pas affirmative, le fichier est ignoré.
+
+OPTIONS
+
+       Supprimer (avec unlink) les FICHIER(s).
+
+       -f, --force
+              ignorer   les   fichiers   inexistants,   ne   pas  demander  de
+              confirmation
+
+       -i     demander une confirmation avant chaque effacement
+
+       -I     demander une fois avant d’effacer plus  de  trois  fichiers,  ou
+              pour  les  effacements  récursifs.  C’est moins intrusif que -i,
+              mais protège tout de même de la plupart des erreurs
+
+       --interactive[=QUAND]
+              demander une  confirmation  en  fonction  de  QUAND :  « never »
+              (jamais),  « once »  (une  fois : -I), ou « always » (toujours :
+              -i). Si QUAND est absent, toujours demander
+
+       --one-file-system
+              lors  des  effacements  récursifs,  sauter  tout  répertoire  se
+              trouvant  sur  un  système  de  fichiers  différent  de celui du
+              paramètre fourni en ligne de commande
+
+       --no-preserve-root
+              ne pas traiter « / » de manière spéciale
+
+       --preserve-root
+              ne pas supprimer « / » (par défaut)
+
+       -r, -R, --recursive
+              enlever le contenu des répertoires récursivement
+
+       -v, --verbose
+              expliquer ce qui est fait
+
+       --help afficher l’aide-mémoire et quitter
+
+       --version
+              afficher le nom et la version du logiciel et quitter
+
+       Par  défaut,  rm  n’efface  pas  les  répertoires.  Utilisez   l’option
+       --recursive  (-r  ou  -R)  pour  effacer  chaque  répertoire  passé  en
+       paramètre en même temps que son contenu.
+
+       Pour enlever un fichier dont le nom commence  par  « - »,  par  exemple
+       «-foo », utilisez une de ces commandes :
+
+              rm -- -foo
+
+              rm ./-foo
+
+       Notez  que  si  vous  utilisez  « rm » pour détruire un fichier, il est
+       habituellement possible de récupérer le contenu de ce fichier. Si  vous
+       voulez  réellement  que son contenu soit irrécupérable, utilisez plutôt
+       shred.
+
+AUTEUR
+
+       Écrit par Paul Rubin, David  MacKenzie,  Richard  M.  Stallman  et  Jim
+       Meyering.
+
+SIGNALER DES BOGUES
+
+       Signaler toute anomalie de rm à bug-coreutils@gnu.org
+       Page           d’accueil           de          GNU          coreutils :
+       <http://www.gnu.org/software/coreutils/>
+       Aide    générale    sur    l’utilisation    des     logiciels     GNU :
+       <http://www.gnu.org/gethelp/>
+       Signaler     toute     erreur     de     traduction     de     rm     à
+       <http://translationproject.org/team/>
+
+COPYRIGHT
+
+       Copyright © 2009 Free Software Foundation, Inc.  Licence  GPLv3+ :  GNU
+       GPL version 3 ou supérieures <http://gnu.org/licenses/gpl.html>
+       Ce  programme  est  un  logiciel  libre.  Vous pouvez le modifier et le
+       redistribuer. Il n’y a AUCUNE GARANTIE dans la mesure autorisée par  la
+       loi.
+
+VOIR AUSSI
+
+       unlink(1), unlink(2), chattr(1), shred(1)
+
+       La  documentation  complète  pour  rm  est  disponible  dans  un manuel
+       Texinfo. Si les programmes info et rm sont correctement  installés  sur
+       votre système, la commande
+
+              info coreutils 'rm invocation'
+
+       devrait vous donner accès au manuel complet (en anglais).
+
+TRADUCTION
+
+       Cette  page de manuel a été traduite par Michel Robitaille <robitail AT
+       iro DOT umontreal DOT ca> et mise à jour pour Debian par Luc Froidefond
+       <luc  DOT  froidefond  AT  free  DOT  fr>  et  les  membres de la liste
+       <debian-l10n-french AT lists DOT debian DOT  org>.   Veuillez  signaler
+       toute  erreur  de  traduction  par  un  rapport  de bogue sur le paquet
+       manpages-fr-extra.
+

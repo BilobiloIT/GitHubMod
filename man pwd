@@ -1,0 +1,72 @@
+man pwd 
+
+NOM
+
+       pwd - Afficher le nom du répertoire de travail actuel
+
+SYNOPSIS
+
+       pwd [OPTION]...
+
+       Afficher le nom complet du répertoire de travail actuel.
+
+       -L, --logical
+              utiliser PWD de l’environnement, même si elle contient des liens
+              symboliques
+
+       -P, --physical
+              évite tous les liens symboliques
+
+       --help afficher l’aide-mémoire et quitter
+
+       --version
+              afficher le nom et la version du logiciel et quitter
+
+       NOTE : votre interpréteur de commandes peut avoir sa propre version  de
+       pwd,  qui  remplace  en  général  la version décrite ici. Veuillez vous
+       référer à la documentation de votre interpréteur de commandes  pour  en
+       connaître les options.
+
+AUTEUR
+
+       Écrit par Jim Meyering.
+
+SIGNALER DES BOGUES
+
+       Signaler toute anomalie de pwd à bug-coreutils@gnu.org
+       Page           d’accueil           de          GNU          coreutils :
+       <http://www.gnu.org/software/coreutils/>
+       Aide    générale    sur    l’utilisation    des     logiciels     GNU :
+       <http://www.gnu.org/gethelp/>
+       Signaler     toute     erreur     de     traduction     de     pwd    à
+       <http://translationproject.org/team/>
+
+COPYRIGHT
+
+       Copyright © 2009 Free Software Foundation, Inc.  Licence  GPLv3+ :  GNU
+       GPL version 3 ou supérieures <http://gnu.org/licenses/gpl.html>
+       Ce  programme  est  un  logiciel  libre.  Vous pouvez le modifier et le
+       redistribuer. Il n’y a AUCUNE GARANTIE dans la mesure autorisée par  la
+       loi.
+
+VOIR AUSSI
+
+       getcwd(3)
+
+       La  documentation  complète  pour  pwd  est  disponible  dans un manuel
+       Texinfo. Si les programmes info et pwd sont correctement installés  sur
+       votre système, la commande
+
+              info coreutils 'pwd invocation'
+
+       devrait vous donner accès au manuel complet (en anglais).
+
+TRADUCTION
+
+       Cette  page de manuel a été traduite par Michel Robitaille <robitail AT
+       iro DOT umontreal DOT ca> et mise à jour pour Debian par  Julien  Rosal
+       <albator  DOT  deb  AT  gmail  DOT  com>  et  les  membres  de la liste
+       <debian-l10n-french AT lists DOT debian DOT  org>.   Veuillez  signaler
+       toute  erreur  de  traduction  par  un  rapport  de bogue sur le paquet
+       manpages-fr-extra.
+

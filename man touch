@@ -1,0 +1,112 @@
+man touch
+
+NOM
+
+       touch - Modifier l’horodatage d’un fichier
+
+SYNOPSIS
+
+       touch [OPTION]... FICHIER...
+
+       Mettre  à  jour  les  dates  (dates  et  heures) d’accès et de dernière
+       modification de chaque FICHIER selon la date actuelle.
+
+       Un paramètre FICHIER qui n’existe pas sera créé vide, à moins  que  les
+       options -c ou -h ne soient fournies.
+
+       Un  paramètre FICHIER égal à - est pris en charge de façon particulière
+       par touch, qui change les temps d’accès du fichier associé à la  sortie
+       standard.
+
+       Les  paramètres  obligatoires  pour les options de forme longue le sont
+       aussi pour les options de forme courte.
+
+       -a     ne modifier que la date d’accès
+
+       -c, --no-create
+              ne créer aucun fichier
+
+       -d, --date=CHANE
+              analyser la CHAÎNE et l’utiliser à la place de la date actuelle
+
+       -f     (ignoré)
+
+       -h, --no-dereference
+              modifier les liens symboliques au lieu des  fichiers  référencés
+              (utile  seulement sur les systèmes permettant de changer la date
+              et l’heure d’un lien symbolique)
+
+       -m     ne modifier que la date de dernière modification
+
+       -r, --reference=FICHIER
+              utiliser la date de ce FICHIER comme référence à la place de  la
+              date actuelle
+
+       -t DATE
+              utiliser [[CC]AA]MMJJhhmm[.ss] à la place de la date actuelle
+
+       --time=MODE
+              modifier   la   date  indiquée  selon  le  MODE :  si  MODE  est
+              « access », « atime » ou « use », équivalent à -a ; si MODE  est
+              « modify » ou « mtime », équivalent à -m
+
+       --help afficher l’aide-mémoire et quitter
+
+       --version
+              afficher le nom et la version du logiciel et quitter
+
+       Notez que les options -d et -t acceptent différents formats de date.
+
+CHAÎNE DES DATES
+
+       Le  format  de  --date=CHAÎNE  est  peu contraint et lisible, comme par
+       exemple « Sun, 29 Feb 2004 16:21:42 -0800 » ou « 2004-02-29  16:21:42 »
+       ou  même  « next  Thursday ».  Une  chaîne  de  date  peut contenir des
+       éléments indiquant la date, l’heure, le fuseau horaire, le jour  de  la
+       semaine, un temps relatif, une date relative et des nombres. Une chaîne
+       vide indique le début du jour. Le format de la chaîne de date est  plus
+       complexe  que  ce  qui  peut  être  facilement  documenté ici, mais est
+       complètement décrit dans la documentation info.
+
+AUTEUR
+
+       Écrit par Paul Rubin, Arnold Robbins, Jim Kingdon, David  MacKenzie  et
+       Randy Smith.
+
+SIGNALER DES BOGUES
+
+       Signaler toute anomalie de touch à bug-coreutils@gnu.org
+       Page           d’accueil           de          GNU          coreutils :
+       <http://www.gnu.org/software/coreutils/>
+       Aide    générale    sur    l’utilisation    des     logiciels     GNU :
+       <http://www.gnu.org/gethelp/>
+       Signaler     toute     erreur     de     traduction    de    touch    à
+       <http://translationproject.org/team/>
+
+COPYRIGHT
+
+       Copyright © 2009 Free Software Foundation, Inc.  Licence  GPLv3+ :  GNU
+       GPL version 3 ou supérieures <http://gnu.org/licenses/gpl.html>
+       Ce  programme  est  un  logiciel  libre.  Vous pouvez le modifier et le
+       redistribuer. Il n’y a AUCUNE GARANTIE dans la mesure autorisée par  la
+       loi.
+
+VOIR AUSSI
+
+       La  documentation  complète  pour  touch  est disponible dans un manuel
+       Texinfo. Si les programmes info et touch  sont  correctement  installés
+       sur votre système, la commande
+
+              info coreutils 'touch invocation'
+
+       devrait vous donner accès au manuel complet (en anglais).
+
+TRADUCTION
+
+       Cette  page de manuel a été traduite par Michel Robitaille <robitail AT
+       iro DOT umontreal DOT ca> et mise à  jour  pour  Debian  par  Jean-Marc
+       Chaton  <chaton  AT  debian  DOT  org>  et  les  membres  de  la  liste
+       <debian-l10n-french AT lists DOT debian DOT  org>.   Veuillez  signaler
+       toute  erreur  de  traduction  par  un  rapport  de bogue sur le paquet
+       manpages-fr-extra.
+
