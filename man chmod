@@ -1,0 +1,178 @@
+man chmod
+
+NOM
+
+       chmod - Modifier les bits de comportement de fichier
+
+SYNOPSIS
+
+       chmod [OPTION]... MODE[,MODE]... FICHIER...
+       chmod [OPTION]... MODE-OCTAL FICHIER
+       chmod [OPTION]... --reference=FICHIER-R FICHIER
+
+       Cette  page  de  manuel documente la version GNU du programme chmod. Le
+       programme chmod modifie les bits de comportement de fichier  de  chacun
+       des  fichiers  indiqués, en suivant l’indication de mode, qui peut être
+       une représentation symbolique des changements à effectuer, ou un nombre
+       octal  représentant le motif binaire des nouveaux bits de comportement.
+
+       Le format d’un mode symbolique [ugoa...][[+-=][permissions...]...],  où
+       permissions  vaut  soit  zéro,  soit  plusieurs  lettres  de l’ensemble
+       rwxXst, soit une  seule  lettre  de  l’ensemble  ugo.  Plusieurs  modes
+       symboliques peuvent être indiqués ensemble, séparés par des virgules.
+
+       Une  combinaison  des  lettres  ugoa  contrôle  la  catégorie d’accès à
+       modifier. Il peut s’agir de l’utilisateur possédant le fichier (u), des
+       autres utilisateurs du même groupe que le fichier (g), des utilisateurs
+       n’appartenant pas au groupe du fichier (o), ou de tous les utilisateurs
+       (a).  Si  aucune  catégorie n’est indiquée, a est pris par défaut, mais
+       les bits correspondant à des bits à 1 de l’umask ne sont pas  affectés.
+
+       L’opérateur  +  ajoute  à  chaque  fichier  les bits de comportement de
+       fichier spécifiés à ceux déjà existants, l’opérateur - les  enlève,  et
+       l’opérateur  =  les  ajoute  tout  en supprimant ceux qui n’ont pas été
+       indiqués. Dans ce dernier cas,  les  bits  d’emprunt  des  identifiants
+       d’utilisateur  et  de  groupe  d’un  répertoire  ne  sont toutefois pas
+       affectés.
+
+       Les lettres rwxXst sélectionnent les bits de  comportement  de  fichier
+       des  utilisateurs  concernés : lecture (r), écriture (w), exécution (ou
+       recherche pour les répertoires) (x), exécution/recherche uniquement  si
+       le   fichier  est  un  répertoire  ou  s’il  a  déjà  une  autorisation
+       d’exécution pour une des catégories d’utilisateur (X), spécification de
+       l’identifiant du propriétaire ou du groupe propriétaire du fichier lors
+       de l’exécution (s), du drapeau de  suppression  restreinte  ou  du  bit
+       sticky  (t). À la place de ces lettres, vous pouvez indiquer une et une
+       seule des lettres de l’ensemble ugo : les permissions dont  dispose  le
+       propriétaire  du fichier (u), les permissions dont disposent les autres
+       membres du groupe propriétaire du fichier (g) et des  permissions  dont
+       disposent tous les autres utilisateurs (o).
+
+       La  valeur  pour  le mode numérique est constituée de 1 à 4 chiffres en
+       octal (0 à 7), calculés en additionnant les bits de valeurs 4, 2 et  1,
+       tout  bit  non  mentionné  étant  considéré comme des zéros en début de
+       chaîne. Le premier chiffre  correspond  aux  attributs  identifiant  de
+       l’utilisateur  (4), identifiant du groupe (2) et suppression restreinte
+       ou bit sticky (1). Le second chiffre correspond  aux  autorisations  de
+       lecture   (4),   écriture  (2)  et  exécution  (1)  pour  l’utilisateur
+       propriétaire  du  fichier.  Les   troisième   et   quatrième   chiffres
+       correspondent respectivement aux autorisations d’accès pour les membres
+       du groupe du fichier, et pour les autres utilisateurs. Les valeurs  ont
+       les mêmes significations que pour le deuxième chiffre.
+
+       Le  programme  chmod  ne  modifie  jamais  les  autorisations des liens
+       symboliques, l’appel système chmod ne pouvant pas  les  modifier.  Ceci
+       n’est  pas  un problème puisque ces autorisations ne sont jamais prises
+       en compte. Cependant, pour chaque  lien  symbolique  mentionné  sur  la
+       ligne  de  commande, chmod modifie les autorisations d’accès du fichier
+       cible. En revanche, chmod  ignore  purement  et  simplement  les  liens
+       symboliques   qu’il   rencontre   lors   des  descentes  récursives  de
+       répertoires.
+
+BITS SETUID ET SETGID
+
+       chmod réinitialise le bit d’emprunt de  l’identifiant  de  groupe  d’un
+       fichier  standard  si  l’identifiant de groupe du fichier ne correspond
+       pas à l’identifiant de groupe effectif de l’utilisateur ou à  l’un  des
+       identifiants  des  groupes  supplémentaires  de  l’utilisateur, sauf si
+       l’utilisateur possède  les  privilèges  appropriés.  Toute  restriction
+       supplémentaire  peut empêcher la prise en compte des bits d’emprunt des
+       identifiants d’utilisateur et de groupe de MODE  ou  de  FICHIER-R.  Ce
+       comportement dépend de la politique appliquée et des fonctionnalités de
+       l’appel système  sous-jacent  chmod.  En  cas  de  doute,  vérifiez  le
+       comportement du système sous-jacent.
+
+       chmod  conserve les bits d’emprunt des identifiants d’utilisateur et de
+       groupe d’un répertoire  sauf  si  explicitement  indiqué.  Vous  pouvez
+       modifier  ou réinitialiser les bits avec des modes symboliques tels que
+       u+s et g-s, et vous pouvez modifier (mais pas réinitialiser)  ces  bits
+       avec un mode numérique.
+
+DRAPEAU DE SUPPRESSION RESTREINTE OU BIT STICKY
+
+       Le drapeau de suppression restreinte ou le bit sticky est un simple bit
+       dont  l’interprétation  dépend  du  système  de  fichiers.   Pour   les
+       répertoires,  il empêche les utilisateurs non autorisés de supprimer ou
+       renommer un fichier dans le répertoire sauf s’ils sont propriétaires de
+       ce  fichier  ou  du  répertoire ; c’est ce qui est appelé le drapeau de
+       suppression restreinte pour le répertoire, et est habituellement trouvé
+       sur  les  répertoires en écriture ouverte comme /tmp. Pour les fichiers
+       normaux sur des systèmes plus  anciens,  le  bit  permet  de  conserver
+       l’image du programme sur le périphérique d’échange afin qu’il se charge
+       plus rapidement au lancement ; c’est ce qui est appelé le bit sticky.
+
+OPTIONS
+
+       Changer le mode de chaque fichier selon le MODE choisi.
+
+       -c, --changes
+              utiliser le mode bavard en ne signalant que les modifications
+
+       --no-preserve-root
+              ne pas traiter « / » de manière spéciale (par défaut)
+
+       --preserve-root
+              ne pas opérer récursivement sur « / »
+
+       -f, --silent, --quiet
+              supprimer la plupart des messages d’erreur
+
+       -v, --verbose
+              afficher un diagnostic pour chaque fichier traité
+
+       --reference=FICHIER-R
+              utiliser le mode FICHIER-R au lieu des valeurs MODE
+
+       -R, --recursive
+              modifier récursivement les fichiers et les répertoires
+
+       --help afficher l’aide-mémoire et quitter
+
+       --version
+              afficher le nom et la version du logiciel et quitter
+
+       Chaque MODE est de la forme « [ugoa]*([-+=]([rwxXst]*|[ugo]))+ ».
+
+AUTEUR
+
+       Écrit par David MacKenzie et Jim Meyering.
+
+SIGNALER DES BOGUES
+
+       Signaler toute anomalie de chmod à bug-coreutils@gnu.org
+       Page          d’accueil          de           GNU           coreutils :
+       <http://www.gnu.org/software/coreutils/>
+       Aide     générale     sur    l’utilisation    des    logiciels    GNU :
+       <http://www.gnu.org/gethelp/>
+       Signaler    toute    erreur    de     traduction     de     chmod     à
+       <http://translationproject.org/team/>
+
+COPYRIGHT
+
+       Copyright  ©  2009  Free Software Foundation, Inc. Licence GPLv3+ : GNU
+       GPL version 3 ou supérieures <http://gnu.org/licenses/gpl.html>
+       Ce programme est un logiciel libre.  Vous  pouvez  le  modifier  et  le
+       redistribuer.  Il n’y a AUCUNE GARANTIE dans la mesure autorisée par la
+       loi.
+
+VOIR AUSSI
+
+       chmod(2)
+
+       La documentation complète pour chmod  est  disponible  dans  un  manuel
+       Texinfo.  Si  les  programmes info et chmod sont correctement installés
+       sur votre système, la commande
+
+              info coreutils 'chmod invocation'
+
+       devrait vous donner accès au manuel complet (en anglais).
+
+TRADUCTION
+
+       Cette page de manuel a été traduite par Michel Robitaille <robitail  AT
+       iro  DOT  umontreal  DOT  ca>  et  mise  à jour pour Debian par Sylvain
+       Archenault <sylvain DOT archenault AT laposte DOT net> et  les  membres
+       de la liste <debian-l10n-french AT lists DOT debian DOT org>.  Veuillez
+       signaler toute erreur de traduction par un  rapport  de  bogue  sur  le
+       paquet manpages-fr-extra.
+

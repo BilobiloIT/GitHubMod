@@ -1,0 +1,723 @@
+man grep
+
+NOM
+
+       grep,  egrep,  fgrep,  rgrep  -  Afficher les lignes correspondant à un
+       motif donné.
+
+SYNOPSIS
+
+       grep [OPTIONS] MOTIF [FICHIER...]
+       grep [OPTIONS] [-e MOTIF | -f FICHIER] [FICHIER...]
+
+       grep recherche dans les FICHIERs indiqués les lignes correspondant à un
+       certain  MOTIF. Par défaut, grep affiche les lignes qui contiennent une
+       correspondance au motif. L’entrée standard est lue si FICHIER est  omis
+       ou si FICHIER vaut « - ».
+
+       Trois variantes du programme sont disponibles : egrep, fgrep et rgrep ;
+       egrep est identique à grep -E, fgrep est identique à grep -F  et  rgrep
+       est   identique  à  grep -r.  L’appel  direct  à  egrep  ou  fgrep  est
+       déconseillé, mais est toujours possible pour  permettre  à  d’anciennes
+       applications qui les utilisent de fonctionner sans modification.
+
+OPTIONS
+
+   Informations générales sur le programme
+       --help Afficher  un  bref  message d’aide pour l’utilisation qui résume
+              les options en ligne de commande et l’adresse pour remonter  des
+              bogues, puis quitter.
+
+       -V, --version
+              Afficher le numéro de version de grep sur la sortie standard. Ce
+              numéro de version devra être inclus dans tous  les  rapports  de
+              bogues (voir ci-dessous).
+
+   Sélection des correspondances
+       -E, --extended-regexp
+              Interpréter  le  MOTIF  comme une expression rationnelle étendue
+              (ERE, voir ci-dessous). (-E est une spécification POSIX.)
+
+       -F, --fixed-strings
+              Interpréter le MOTIF comme une liste de chaînes  de  caractères,
+              séparées par des sauts de ligne. Chacune d’entre elles doit être
+              recherchée. (-F est une spécification POSIX.)
+
+       -G, --basic-regexp
+              Interpréter le MOTIF comme  une  expression  rationnelle  simple
+              (BRE, voir ci-dessous). C’est le comportement par défaut.
+
+       -P, --perl-regexp
+              Interpréter  le  MOTIF  comme  une  expression rationnelle Perl.
+              Cette option est expérimentale et grep -P pourrait signaler  des
+              fonctionnalités non implémentées.
+
+   Contrôle de concordance
+       -e MOTIF, --regexp=MOTIF
+              Utiliser  le  MOTIF  comme  motif.  Ceci  peut être utilisé pour
+              spécifier des motifs de  recherche  multiples  ou  protéger  les
+              motifs  commençant par un tiret « - ». (-e est une spécification
+              POSIX.)
+
+       -f FICHIER, --file=FICHIER
+              Lire les motifs dans le FICHIER indiqué, un motif par ligne.  Un
+              fichier   vide  ne  contient  aucun  motif,  si  bien  qu’aucune
+              concordance n’est trouvée. (-f est une spécification POSIX.)
+
+       -i, --ignore-case
+              Ignorer la casse aussi bien dans le MOTIF que dans les fichiers.
+              (-i est une spécification POSIX.)
+
+       -v, --invert-match
+              Inverser la mise en concordance, pour sélectionner les lignes ne
+              correspondant pas au motif. (-v est une spécification POSIX.)
+
+       -w, --word-regexp
+              Ne  sélectionner  que  les  lignes  contenant  des  concordances
+              formant  des  mots  complets. La sous-chaîne correspondante doit
+              donc soit se trouver au début de la ligne,  soit  être  précédée
+              d’un  caractère ne pouvant entrer dans la constitution d’un mot.
+              De même, elle doit soit se trouver à la fin de  la  ligne,  soit
+              être   suivie  par  un  caractère  ne  pouvant  entrer  dans  la
+              constitution d’un mot. Les caractères composant  les  mots  sont
+              les lettres, les chiffres et le souligné « _ ».
+
+       -x, --line-regexp
+              Ne  sélectionner  que  les concordances qui concernent une ligne
+              entière. (-x est une spécification POSIX.)
+
+       -y     Synonyme obsolète de -i.
+
+   Contrôle général de l’affichage
+       -c, --count
+              Ne pas afficher les résultats normaux. À la place,  afficher  un
+              décompte  des lignes correspondant au motif pour chaque fichier.
+              Avec l’option -v, --invert-match (voir ci-dessous), afficher  le
+              nombre  de  lignes  ne  contenant  pas  le  motif.  (-c  est une
+              spécification POSIX.)
+
+       --color[=QUAND], --colour[=QUAND]
+              Encadre les chaînes (non vides) des correspondances, les  lignes
+              qui correspondent, les lignes de contexte, les noms de fichiers,
+              les numéros de lignes et les séparateurs  (pour  les  champs  et
+              groupes  de lignes de contexte) avec des séquences d’échappement
+              pour les afficher en couleur sur le terminal. Les couleurs  sont
+              définies par la variable d’environnement GREP_COLORS. L’ancienne
+              variable d’environnement GREP_COLOR  est  toujours  gérée,  mais
+              elle a une priorité inférieure pour décider de la configuration.
+              QUAND vaut never (jamais), always (toujours) ou auto.
+
+       -L, --files-without-match
+              Ne pas afficher les résultats normaux. À la place,  indiquer  le
+              nom  des  fichiers  pour  lesquels  aucun  résultat n’aurait été
+              affiché. La recherche dans chaque fichier cesse dès la  première
+              concordance.
+
+       -l, --files-with-matches
+              Ne  pas  afficher les résultats normaux. À la place, indiquer le
+              nom des  fichiers  pour  lesquels  des  résultats  auraient  été
+              affichés. La recherche dans chaque fichier cesse dès la première
+              concordance. (-l est spécifiée dans POSIX)
+
+       -m N, --max-count=N
+              Arrêter  de  lire  un  fichier  après  avoir  trouvé  N   lignes
+              concordantes.  Si l’entrée est l’entrée standard prise depuis un
+              fichier normal, et si N lignes qui correspondent sont affichées,
+              grep  s’assure  avant  de  s’arrêter  que  l’entrée standard est
+              positionnée juste après la dernière  ligne  qui  concorde,  même
+              s’il  y  a  des lignes de contexte supplémentaires ensuite. Ceci
+              permet au processus d’appel de redémarrer une  recherche.  Quand
+              grep  s’arrête  après N lignes de concordance, il affiche toutes
+              les lignes  de  contexte.  Quand  l’option  -c  ou  --count  est
+              utilisée, grep n’affiche pas plus de N lignes. Quand l’option -v
+              ou --invert-match est aussi utilisée, grep s’arrête après  avoir
+              affiché N lignes qui ne contiennent pas le motif.
+
+       -o, --only-matching
+              N’afficher  que  les  parties  qui correspondent (et ne sont pas
+              vide) des lignes qui correspondent, chaque partie étant affichée
+              sur une ligne séparée.
+
+       -q, --quiet, --silent
+              Ne pas afficher les résultats normaux. Sortir immédiatement avec
+              un code de  retour  égal  à  zéro  dès  qu’une  concordance  est
+              trouvée,  même  si une erreur est détectée. Voyez aussi l’option
+              -s ou --no-messages. (-q est spécifiée dans POSIX)
+
+       -s, --no-messages
+              Ne pas afficher les messages d’erreur  concernant  les  fichiers
+              inexistants ou illisibles. Note de portabilité : à la différence
+              du grep de GNU, le grep  de  la  7e  édition  d’Unix  n’est  pas
+              conforme  au  standard  POSIX, car il n’a pas d’option -q et son
+              option -s agit comme l’option -q du grep de GNU. La version  USG
+              de  grep n’avait pas non plus d’option -q, mais son option -s se
+              comportait comme celle de la version GNU de  grep.  Les  scripts
+              shell  destinés  à  être  utilisés  avec  le  grep  traditionnel
+              devraient éviter d’utiliser les options -q et -s,  et  devraient
+              plutôt  rediriger  la  sortie  vers /dev/null. (-s est spécifiée
+              dans POSIX)
+
+   Contrôle du préfixe à l’affichage
+       -b, --byte-offset
+              Afficher l’emplacement dans le fichier (qui commence  à  l’octet
+              0)  devant  chaque  ligne de sortie. Si -o (--only-matching) est
+              spécifiée, afficher l’emplacement de la partie qui correspond.
+
+       -H, --with-filename
+              Afficher le nom du fichier pour chaque correspondance. C’est  le
+              comportement  par  défaut  quand  la recherche est effectuée sur
+              plusieurs fichiers.
+
+       -h, --no-filename
+              Ne pas afficher le nom des fichiers  au  début  des  lignes  qui
+              correspondent.  C’est  le comportement par défaut quand il n’y a
+              qu’un fichier (ou que l’entrée standard) dans  lequel  effectuer
+              la recherche.
+
+       --label=TIQUETTE
+              Afficher  les  données  provenant  de l’entrée standard comme si
+              elles provenaient du fichier TIQUETTE.  C’est  particulièrement
+              utile pour des outils comme zgrep, par exemple : gzip -cd foo.gz
+              |grep --label=truc quelquechose
+
+       -n, --line-number
+              Préfixer chaque ligne de sortie par le numéro de la  ligne  dans
+              le  fichier.  La  numérotation  commence  à  la ligne 1. (-n est
+              spécifiée dans POSIX)
+
+       -T, --initial-tab
+              S’assurer que le premier caractère correspondant au contenu  est
+              placé  à  un  emplacement  d’arrêt  d’une  tabulation,  pour que
+              l’alignement des tabulations paraisse  normal.  Ceci  est  utile
+              avec les options qui utilisent un préfixe avant le contenu : -H,
+              -n  et -b. Pour augmenter la probabilité que toutes  les  lignes
+              d’un  fichier  commencent à la même colonne, cela force aussi le
+              numéro de ligne et l’emplacement (s’ils sont  présents)  à  être
+              affichés dans un champ de taille minimale.
+
+       -u, --unix-byte-offsets
+              Afficher la position relative en octets dans le style Unix. Avec
+              cette option, grep affiche la position relative en octets  comme
+              si   le  fichier  était  un  fichier  de  texte  de  type  Unix,
+              c’est-à-dire avec  les  caractères  CR  supprimés.  Ceci  permet
+              d’avoir  un résultat identique à celui retourné par grep sur une
+              machine Unix. Cette option n’a d’effet que si elle est  utilisée
+              conjointement  avec  l’option  -b,  et sur une machine MS-DOS ou
+              MS-Windows.
+
+       -Z, --null
+              Afficher un octet nul (le caractère ASCII NUL)  à  la  place  du
+              caractère  qui  suit d’ordinaire le nom du fichier. Par exemple,
+              grep -lZ affiche un octet nul après chaque nom de fichier, à  la
+              place  du saut de ligne. Cette option permet de rendre la sortie
+              non ambiguë, même quand les noms  de  fichiers  contiennent  des
+              caractères  inhabituels,  comme des sauts de ligne. Cette option
+              peut être utilisée avec des commandes telles que  find  -print0,
+              perl -0, sort -z, et xargs -0 pour traiter des fichiers avec des
+              noms quelconques, même ceux contenant des sauts de ligne.
+
+   Contrôle des lignes de contexte
+       -A N, --after-context=N
+              Afficher les N lignes qui suivent celle contenant le motif.  Une
+              ligne  contenant  --  est  insérée entre les groupes contigus de
+              correspondances. Avec l’option -o  ou  --only-matching,  ça  n’a
+              aucun effet et un avertissement est affiché.
+
+       -B N, --before-context=N
+              Afficher les N lignes qui précèdent celle qui contient le motif.
+              Une ligne contenant -- est insérée entre les groupes contigus de
+              correspondances.  Avec  l’option  -o  ou --only-matching, ça n’a
+              aucun effet et un avertissement est affiché.
+
+       -C N, -N, --context=N
+              Afficher N lignes  de  contexte.  Une  ligne  contenant  --  est
+              insérée  entre  les  groupes  contigus  de correspondances. Avec
+              l’option -o  ou  --only-matching,  ça  n’a  aucun  effet  et  un
+              avertissement est affiché.
+
+   Sélection de fichiers ou répertoires
+       -a, --text
+              Traiter  un  fichier  binaire  comme  s’il s’agissait de texte ;
+              c’est l’équivalent de l’option --binary-files=text.
+
+       --binary-files=TYPE
+              Si les premiers octets d’un fichier indiquent qu’il contient des
+              données  binaires,  considérer  que le fichier est de type TYPE.
+              Par défaut, TYPE est binary, et grep affiche un message uniligne
+              disant  que  le  fichier  binaire contient le motif ou n’affiche
+              rien s’il n’y a pas concordance. Si TYPE est without-match, grep
+              considère  qu’un  fichier  binaire  ne  concorde  jamais.  C’est
+              équivalent à l’option -I. Si  TYPE  est  text,  grep  traite  un
+              fichier  binaire comme du texte. C’est équivalent à l’option -a.
+              Attention : grep --binary-files=text peut afficher  des  données
+              binaires   indésirables,  qui  peuvent  avoir  des  conséquences
+              fâcheuses si la sortie est envoyée vers un  terminal  et  si  le
+              pilote de celui-ci l’interprète en tant que commandes.
+
+       -D ACTION, --devices=ACTION
+              Si  le  fichier  est  un  périphérique,  une FIFO ou une socket,
+              utiliser ACTION dessus. Par défaut, ACTION est  read  (lecture),
+              ce  qui  signifie  que  les  périphériques  sont  lus  comme des
+              fichiers normaux. Si ACTION est  skip,  les  périphériques  sont
+              ignorés en silence.
+
+       -d ACTION, --directories=ACTION
+              Si  le  fichier  est un répertoire, utiliser ACTION. Par défaut,
+              ACTION est read, ce qui signifie que les  répertoires  sont  lus
+              comme  des fichiers normaux. Si ACTION est skip, les répertoires
+              sont ignorés et aucun  message  n’est  affiché.  Si  ACTION  est
+              recurse,  grep  lit  tous  les  fichiers  présents  dans  chaque
+              répertoire, récursivement. C’est équivalent à l’option -r.
+
+       --exclude=MOTIF
+              Sauter les fichiers dont le nom de fichier  correspond  à  MOTIF
+              (en  utilisant  une  correspondance  avec  joker).  Un  motif de
+              fichier peut utiliser les jokers *,  ?,  and  [...]  et  \  pour
+              l’échappement  des  caractères  littéraux joker ou barre oblique
+              inverse.
+
+       --exclude-from=FICHIER
+              Sauter les fichiers dont le nom de fichier correspond à  un  des
+              motifs  contenus  dans le FICHIER (en utilisant les jokers comme
+              décrit pour --exclude).
+
+       --exclude-dir=RP
+              Exclure les répertoires  qui  correspondent  au  motif  RP  des
+              recherches récursives.
+
+       -I     Traiter  un  fichier  binaire  comme  s’il  ne  contenait aucune
+              concordance ;      c’est       équivalent       à       l’option
+              --binary-files=without-match.
+
+       --include=MOTIF
+              Ne  chercher  que  dans  les  fichiers  dont  le  nom de fichier
+              correspond à MOTIF (en utilisant les jokers, comme  décrit  pour
+              --exclude).
+
+       -R, -r, --recursive
+              Lire  récursivement  tous  les  fichiers à l’intérieur de chaque
+              répertoire. C’est l’équivalent de l’option -d recurse.
+
+   Autres options
+       --line-buffered
+              Mettre les lignes de sortie dans un tampon.  Ceci  peut  réduire
+              les performances.
+
+       --mmap Si  possible, utiliser la fonction système mmap(2) pour lire les
+              données  en  entrée  plutôt  que  la  fonction  système  read(2)
+              utilisée par défaut. Dans certaines circonstances, --mmap permet
+              de meilleures performances.  Cependant,  --mmap  peut  avoir  un
+              comportement  aléatoire (y compris la génération d’un core dump)
+              si un fichier voit sa taille réduite pendant que grep le lit, ou
+              si une erreur d’entrée-sortie survient.
+
+       -U, --binary
+              Traiter  les fichiers comme s’ils étaient des fichiers binaires.
+              Par défaut, sous MS-DOS et MS-Windows, grep détermine le type de
+              fichier  en regardant le contenu des 32 premiers kilo-octets. Si
+              grep décide que le fichier est un fichier de  texte,  il  enlève
+              les  retours  chariot  (CR) du contenu du fichier original (afin
+              que les expressions avec  ^  et  $  fonctionnent  correctement).
+              L’option  -U  modifie  ce  comportement,  tous les fichiers sont
+              alors lus et traités tels quels. Si le fichier est un fichier de
+              texte   avec  des  paires  CR-LF  en  fin  de  ligne,  certaines
+              expressions rationnelles peuvent échouer. Cette option n’a aucun
+              effet sur des plates-formes autres que MS-DOS et MS-Windows.
+
+       -z, --null-data
+              Considérer  que  l’entrée  est  un  ensemble  de lignes, chacune
+              terminée par un octet nul (le caractère ASCII NUL) au lieu  d’un
+              saut  de  ligne.  Comme l’option -Z ou --null, cette option peut
+              être combinée avec des commandes comme sort -z pour traiter  des
+              fichiers ayant un nom quelconque.
+
+EXPRESSIONS RATIONNELLES
+
+       Une  expression  rationnelle  est  un  motif  qui  permet de décrire un
+       ensemble de chaînes.  Les  expressions  rationnelles  sont  construites
+       comme   des   opérations  arithmétiques ;  elles  utilisent  différents
+       opérateurs pour combiner des expressions plus petites.
+
+       Grep gère deux styles de syntaxe pour  les  expressions  rationnelles :
+       «simple »  (basic)  et  « étendue »  (extended). Dans la version GNU de
+       grep, il n’y a pas de différence dans les  fonctionnalités  disponibles
+       pour  ces  deux  styles. Dans d’autres implémentations, les expressions
+       rationnelles simples sont moins complètes.  La  description  ci-dessous
+       correspond   aux   expressions   étendues,  les  différences  avec  les
+       expressions simples étant résumées ensuite.
+
+       Les   briques   élémentaires   sont   les   expressions    rationnelles
+       correspondant à un seul caractère. La plupart des caractères, y compris
+       les lettres et les chiffres, constituent des  expressions  rationnelles
+       et   concordent   avec   eux-mêmes.   Tout   méta-caractère  ayant  une
+       signification particulière doit être protégé  en  le  faisant  précéder
+       d’une contre-oblique (backslash).
+
+       Le point . correspond à n’importe quel caractère.
+
+   Classes de caractères et expressions entre crochets
+       Une  liste  de  caractères,  encadrée  par  [  et  ]  peut être mise en
+       correspondance avec n’importe quel caractère appartenant à la liste. Si
+       le  premier caractère de la liste est l’accent circonflexe « ^ », alors
+       la mise en correspondance se fait avec n’importe quel caractère  absent
+       de   la  liste.  Par  exemple,  l’expression  rationnelle  [0123456789]
+       concorde avec n’importe quel chiffre.
+
+       Entre ces crochets, un intervalle de caractères peut  être  indiqué  en
+       donnant  le  premier  et le dernier caractère, séparés par un tiret. il
+       correspond à n’importe quel caractère compris entre le  premier  et  le
+       dernier  caractère  (ceux-ci  inclus), l’ordre des caractères dépendant
+       des paramètres régionaux (locale, en anglais) en cours. Ainsi, avec  la
+       valeur par défaut (« C »), [a-d] est équivalent à [abcd]. Avec beaucoup
+       de paramètres régionaux, les caractères sont triés en  suivant  l’ordre
+       des dictionnaires, et [a-d] n’est alors pas équivalent à [abcd], mais à
+       [aBbCcDd], par exemple. Pour  que  ces  listes  aient  le  comportement
+       habituel  de « C », vous pouvez positionner la variable d’environnement
+       LC_ALL à la valeur C.
+
+       Enfin, il existe certaines classes  de  caractères  prédéfinies.  Leurs
+       noms sont assez explicites : [:alnum:], [:alpha:], [:cntrl:], [:digit:]
+       (chiffres), [:graph:], [:lower:] (minuscules), [:print:] (affichables),
+       [:punct:] (ponctuation), [:space:] (espace), [:upper:] (majuscules), et
+       [:xdigit:] (chiffres hexadécimaux). Par exemple, [[:alnum:]] correspond
+       à  [0-9A-Za-z],  à  la  différence  près  que  ce  dernier  dépend  des
+       paramètres régionaux C et du codage de caractères ASCII, alors  que  le
+       premier  est plus portable. Remarquez que les crochets dans les noms de
+       classes font partie intégrante du nom  symbolique,  et  qu’ils  doivent
+       donc  être  inclus en plus des crochets encadrant ces expressions entre
+       crochets. La plupart des  méta-caractères  perdent  leur  signification
+       particulière  à  l’intérieur  d’une  expression  entre  crochets.  Pour
+       inclure un caractère ], mettez-le en premier dans la  liste.  De  même,
+       pour inclure un caractère ^, placez-le n’importe où sauf au début de la
+       liste. Enfin, pour inclure un -, placez-le en dernier.
+
+   Ancrage
+       L’accent  circonflexe  « ^ »  et  le  symbole  dollar  « $ »  sont  des
+       méta-caractères correspondant respectivement à une chaîne vide au début
+       et en fin de ligne.
+
+   Caractère barre oblique inverse et les expressions spéciales
+       Les symboles \< et \> correspondent respectivement à une chaîne vide en
+       début  et  en  fin de mot. Le symbole \b correspond à une chaîne vide à
+       l’extrémité d’un mot, et \B correspond à une chaîne vide ne se trouvant
+       pas  à  une  extrémité  de  mot.  Le  symbole  \w  est un synonyme pour
+       [[:alnum:]] et \W est un synonyme pour [^[:alnum:]].
+
+   Répétitions
+       Dans une expression rationnelle, un caractère peut être suivi par  l’un
+       des opérateurs de répétition suivants :
+       ?      L’élément  précédent  est  facultatif  et peut être rencontré au
+              plus une fois.
+       *      L’élément précédent peut être rencontré zéro ou plusieurs  fois.
+       +      L’élément précédent peut être rencontré une ou plusieurs fois.
+       {n}    L’élément précédent doit correspondre exactement n fois.
+       {n,}   L’élément précédent doit correspondre n fois ou plus.
+       {,m}   L’élément précédent doit correspondre au plus m fois.
+       {n,m}  L’élément  précédent  doit correspondre au moins n fois, mais au
+              plus m fois.
+
+   Concaténations
+       Deux expressions rationnelles peuvent être  juxtaposées ;  l’expression
+       résultante  correspondra  à toute chaîne formée par la juxtaposition de
+       deux sous-chaînes correspondant respectivement aux deux expressions.
+
+   Alternatives
+       Deux expressions rationnelles  peuvent  être  reliées  par  l’opérateur
+       infixe  | ;  l’expression  résultante  correspondra  à toute chaîne qui
+       comporte l’une ou l’autre des deux expressions.
+
+   Priorités
+       Les répétitions ont priorité sur les concaténations, qui  à  leur  tour
+       ont  priorité  sur  les  alternatives.  Une  sous-expression  peut être
+       entourée par des parenthèses pour modifier ces règles  de  priorité  et
+       former une expression.
+
+   Références arrières et sous-expressions
+       La  référence  inverse  \n, où n est un chiffre unique, correspond à la
+       sous-chaîne déjà mise en correspondance avec la n-ième  sous-expression
+       rationnelle entre parenthèses.
+
+   Expressions rationnelles basiques et étendues
+       Dans les expressions rationnelles simples, les méta-caractères ?, +, {,
+       |, (, et ) perdent leur signification spéciale, il faut utiliser  à  la
+       place leur version avec la contre-oblique \?, \+, \{, \|, \(, et \).
+
+       La  version  traditionnelle d’egrep ne connaît pas le méta-caractère {,
+       et certaines implémentations d’egrep utilisent \{ à la place,  si  bien
+       que  des  scripts  shell  portables  devraient éviter { dans les motifs
+       d’egrep et utiliser [{] pour désigner un caractère {.
+
+       GNU grep -E essaie d’émuler l’usage traditionnel  en  supposant  que  {
+       n’est  pas  spécial  au  cas où il rendrait invalide l’expression qu’il
+       commence. Par exemple, la  commande  shell  grep -E '{1'  recherche  la
+       chaîne  composée  des deux caractères {1 au lieu de signaler une erreur
+       de syntaxe. POSIX.2 permet ce comportement comme  une  extension  à  la
+       norme, mais les scripts portables devraient l’éviter.
+
+VARIABLES D’ENVIRONNEMENT
+       Le  comportement  de grep est modifié par les variables d’environnement
+       suivantes :
+
+       Les paramètres régionaux pour la catégorie LC_foo est définie  par  les
+       trois  variables d’environnement LC_ALL, LC_truc, LANG, dans cet ordre.
+       La variable positionnée en premier détermine le  choix  des  paramètres
+       régionaux.   Par   exemple,  si  LC_ALL  n’est  pas  positionnée,  mais
+       LC_MESSAGES vaut fr_FR, alors le français est utilisé pour  l’affichage
+       des  messages.  Par  défaut  « C »  est  utilisée  si  aucune  variable
+       d’environnement n’est trouvée, si le catalogue des paramètres régionaux
+       n’est  pas  installé ou bien si grep a été compilé sans le support pour
+       les langues nationales (NLS).
+
+       GREP_OPTIONS
+              Cette variable définit des options  qui  seront  ajoutées  avant
+              n’importe  quelle  option explicite de la ligne de commande. Par
+              exemple,  si  GREP_OPTIONS  vaut  « --binary-files=without-match
+              --directories=skip », grep se comporte comme si les deux options
+              --binary-files=without-match et --directories=skip  avaient  été
+              spécifiées  avant  les  options  explicites. Différentes options
+              peuvent être séparées par des  espaces,  et  une  contre-oblique
+              supprime  la signification spéciale du caractère suivant, ce qui
+              permet de spécifier une  option  contenant  une  espace  ou  une
+              contre-oblique.
+
+       GREP_COLOR
+              Cette  variable  spécifie  la  couleur  utilisée  pour mettre en
+              évidence le texte qui correspond (et n’est pas vide).  Elle  est
+              dépréciée  en  faveur de GREP_COLORS, mais est encore gérée. Les
+              capacités mt, ms et mc de GREP_COLORS sont plus prioritaires que
+              celles-ci.  Cette variable ne peut que spécifier la couleur pour
+              mettre en évidence le texte non vide  qui  correspond  dans  une
+              ligne  qui  correspond (une ligne sélectionnée quand l’option de
+              la ligne de commande -v n’est pas  utilisée,  ou  une  ligne  de
+              contexte  quand  -v  est  spécifiée).  La  valeur par défaut est
+              01;31, ce qui correspond à une fonte grasse,  avec  une  couleur
+              d’encre rouge avec le fond par défaut du terminal.
+
+       GREP_COLORS
+              Spécifier  les couleurs et autres attributs utilisés pour mettre
+              en évidence différentes parties de la sortie. Sa valeur est  une
+              liste  de  capacités  séparées par des deux-points, qui vaut par
+              défaut  ms=01;31:mc=01;31:sl=:cx=:fn=35:ln=32:bn=32:se=36   sans
+              les  capacités booléennes rv et ne (qui prennent alors la valeur
+              « false », faux). Les capacités gérées sont les suivantes :
+
+              sl=    Sous-chaîne SGR (« Select Graphic Rendition »)  pour  les
+                     lignes  entières  sélectionnées  (c’est-à-dire les lignes
+                     qui correspondent quand l’option en ligne de commande  -v
+                     n’est  pas  utilisée,  ou les lignes qui ne correspondent
+                     pas quand -v est spécifiée).  Si  cependant  la  capacité
+                     booléenne  rv  et  l’option  en ligne de commande -v sont
+                     toutes deux spécifiées, ça  s’applique  à  la  place  aux
+                     lignes  de  contexte  qui  correspondent.  La  valeur par
+                     défaut est vide (c’est-à-dire la paire  de  couleurs  par
+                     défaut du terminal).
+
+              cx=    Sous-chaîne  SGR  pour  les  lignes  de contexte entières
+                     (c’est-à-dire les lignes qui ne correspondent  pas  quand
+                     l’option  en  ligne de commande -v n’est pas utilisée, ou
+                     les lignes qui correspondent quand -v est spécifiée).  Si
+                     cependant  la  capacité booléenne rv et l’option en ligne
+                     de commande -v sont toutes deux spécifiées, ça s’applique
+                     à la place aux lignes qui ne correspondent pas. La valeur
+                     par défaut est vide (c’est-à-dire la  paire  de  couleurs
+                     par défaut du terminal).
+
+              rv     Valeur   booléenne   qui  inverse  la  signification  des
+                     capacités sl= et cx= quand la ligne de  commande  -v  est
+                     spécifiée.  La  valeur  par  défaut  est  le booléen faux
+                     (c’est-à-dire la capacité est omise).
+
+              mt=01;31
+                     Sous-chaîne SGR pour le texte  non  vide  qui  correspond
+                     dans les lignes qui correspondent (c’est-à-dire une ligne
+                     sélectionnée quand l’option en ligne de commande -v n’est
+                     pas  utilisée,  ou  une  ligne  de  contexte quand -v est
+                     spécifiée). L’utiliser est équivalent  à  utiliser  à  la
+                     fois ms= et mc= avec la même valeur. La valeur par défaut
+                     correspond à une fonte grasse, avec une  couleur  d’encre
+                     rouge sur le fond de la ligne en cours.
+
+              ms=01;31
+                     Sous-chaîne  SGR  pour  le  texte non vide qui correspond
+                     dans une ligne sélectionnée (ce n’est utilisé  que  quand
+                     l’option  en  ligne  de  commande -v n’est pas utilisée).
+                     L’effet de la capacité sl= (ou cx=  si  rv  est  activée)
+                     reste  actif  quand  c’est  utilisé. La valeur par défaut
+                     correspond à une fonte grasse, avec une  couleur  d’encre
+                     rouge sur le fond de la ligne en cours.
+
+              mc=01;31
+                     Sous-chaîne  SGR  pour  le  texte non vide qui correspond
+                     dans les lignes de contexte (ce n’est utilisé  que  quand
+                     l’option  en  ligne  de  commande -v n’est pas utilisée).
+                     L’effet de la capacité cx= (ou sl=  si  rv  est  activée)
+                     reste  actif  quand  c’est  utilisé. La valeur par défaut
+                     correspond à une fonte grasse, avec une  couleur  d’encre
+                     rouge sur le fond de la ligne en cours.
+
+              fn=35  Sous-chaîne  SGR  pour  les noms de fichier qui préfixent
+                     les lignes de contenu. La valeur par défaut correspond  à
+                     du  texte  de  couleur  magenta sur le fond par défaut du
+                     terminal.
+
+              ln=32  Sous-chaîne SGR pour les numéros de ligne  qui  préfixent
+                     les  lignes de contenu. La valeur par défaut correspond à
+                     du texte de couleur verte  sur  le  fond  par  défaut  du
+                     terminal.
+
+              bn=32  Sous-chaîne  SGR  pour les emplacements qui préfixent les
+                     lignes de contenu. La valeur par défaut correspond  à  du
+                     texte  de  couleur  verte  sur  le  fond  par  défaut  du
+                     terminal.
+
+              se=36  Sous-chaîne SGR pour les  séparateurs  qui  sont  insérés
+                     entre  les champs des lignes sélectionnées (:), entre les
+                     champs des lignes de contexte (-) et entre les groupes de
+                     lignes  adjacentes quand un contexte non nul est spécifié
+                     (--). La valeur par  défaut  correspond  à  du  texte  de
+                     couleur cyan sur le fond par défaut du terminal.
+
+              ne     Valeur  booléenne  qui évite l’effacement de la fin de la
+                     ligne en utilisant une séquence EL (« Erase in Line », ou
+                     en  français  « effacement  en  ligne »)  vers  la droite
+                     (\33[K) à chaque fois qu’un élément  coloré  se  termine.
+                     C’est nécessaire pour les terminaux sur lesquels EL n’est
+                     pas géré. Sinon, c’est aussi utile pour les terminaux sur
+                     lesquels      la      capacité     booléenne     terminfo
+                     « back_color_erase » (bce) ne s’applique pas,  quand  les
+                     couleurs de mise en évidence ne touchent pas à la couleur
+                     de fond,  quand  EL  est  trop  lent  ou  cause  trop  de
+                     scintillements.  La valeur par défaut est le booléen faux
+                     (c’est-à-dire que la capacité n’est pas activée).
+
+              Notez que les capacités booléenne n’ont pas de partie  « =... ».
+              Elles  sont  omises  par  défaut (ce qui correspond à une valeur
+              booléenne fausse) et deviennent vrai si elles sont spécifiées.
+
+              Voir  la  section  Select  Graphic  Rendition  (SGR)   dans   la
+              documentation  du terminal texte utilisé pour avoir la liste des
+              valeurs autorisées et  leur  signification  comme  attributs  de
+              caractère.  Ces  valeurs  de  sous-chaînes sont des entiers sous
+              forme  décimale  et  peuvent  être  concaténées  à   l’aide   de
+              points-virgules.  grep  se charge d’assembler le résultat en une
+              séquence  SGR  complète  (\33[...m).  Les  valeurs  courantes  à
+              concaténer   sont   entre  autres  1  (gras),  4  (souligné),  5
+              (clignotant), 7 (inversé), 39 (couleur de trait par défaut),  30
+              à  37  (couleurs  de  trait), 90 à 97 (couleurs de trait en mode
+              16 couleurs), 38;5;0 à 38;5;255 (couleurs de trait en mode 88 et
+              256 couleurs),  49  (couleur  de  fond  par  défaut),  40  à  47
+              (couleurs de  fond),  100  à  107  (couleurs  de  fond  en  mode
+              16 couleurs)  et  48;5;0 à 48;5;255 (couleurs de fond en mode 88
+              et 256 couleurs).
+
+       LC_ALL, LC_COLLATE, LANG
+              Ces variables spécifient le choix des paramètres régionaux  pour
+              la  catégorie  LC_COLLATE,  qui détermine l’ordre des caractères
+              utilisé pour l’interprétation des intervalles tels que [a-z].
+
+       LC_ALL, LC_CTYPE, LANG
+              Ces variables spécifient le choix des paramètres régionaux  pour
+              la  catégorie  LC_CTYPE  qui  détermine  le codage de caractères
+              utilisé,  par  exemple  pour  indiquer  quels  caractères   sont
+              considérés comme étant des espaces.
+
+       LC_ALL, LC_MESSAGES, LANG
+              Ces  variables spécifient le choix des paramètres régionaux pour
+              la catégorie LC_MESSAGES, qui détermine la langue  utilisée  par
+              grep  pour  ses  messages.  Par défaut, avec « C », les messages
+              sont en anglais américain.
+
+       POSIXLY_CORRECT
+              Si cette  variable  est  positionnée,  grep  se  comporte  comme
+              indiqué  dans  la  norme  POSIX.2.  Sinon, grep se comporte plus
+              comme les  autres  programmes  GNU.  POSIX.2  requiert  que  les
+              options  qui  suivent  des  noms  de fichiers soient considérées
+              aussi comme des noms de fichiers. Par défaut, ces  options  sont
+              déplacées  avant  la  liste des opérandes et sont traitées comme
+              des  options.  POSIX.2  requiert  aussi  que  les  options   non
+              reconnues  soient  considérées  comme « illégales » ; mais comme
+              elles  n’enfreignent  pas  vraiment  les  règles,   elles   sont
+              rapportées comme étant « invalides » par défaut. POSIXLY_CORRECT
+              désactive aussi l’option _N_GNU_nonoption_argv_flags_,  qui  est
+              décrite plus bas.
+
+       _N_GNU_nonoption_argv_flags_
+              (Ici, N est l’identifiant numérique du processus de grep). Si le
+              i-ième caractère de la valeur de cette variable  d’environnement
+              vaut  1,  le  i-ième  opérande de grep n’est pas considéré comme
+              étant une option, même s’il semble l’être. Un shell peut  placer
+              cette  variable  dans l’environnement de chaque commande lancée,
+              pour spécifier quels opérandes sont le résultat du  remplacement
+              de  méta-caractères et ne doivent donc pas être considérés comme
+              des  options.  Ce  comportement   n’est   présent   qu’avec   la
+              bibliothèque C de GNU, et seulement si POSIXLY_CORRECT n’est pas
+              positionnée.
+
+CODE DE RETOUR
+
+       Normalement, le code de retour est nul si  des  lignes  à  sélectionner
+       sont  trouvées et il vaut 1 dans le cas contraire. Cependant le code de
+       retour vaut 2 si une erreur est survenue, à moins  qu’une  des  options
+       -q, --quiet ou --silent ne soit utilisée et qu’une ligne à sélectionner
+       soit trouvée. Notez toutefois que POSIX spécifie que le code de  retour
+       en  cas d’erreur doit être supérieur à 1 ; il est donc recommandé, pour
+       rester portable, de tester la condition générale plutôt qu’une  égalité
+       stricte à 2.
+
+COPYRIGHT
+
+       Copyright © 1998, 1999, 2000, 2002, 2005 Free Software Foundation, Inc.
+
+       Ce logiciel est  libre ;  voir  les  sources  pour  les  conditions  de
+       reproduction.  AUCUNE  garantie  n’est  donnée,  pas  même  la garantie
+       implicite de COMMERCIALISATION ni d’ADÉQUATION À UN BESOIN PARTICULIER.
+
+BOGUES
+
+   Remonter des bogues
+       Envoyez    les    rapports    de   bogue   ([ndt]   en   anglais !)   à
+       <bug-grep@gnu.org>, une  liste  de  diffusion  dont  la  page  web  est
+       <http://lists.gnu.org/mailman/listinfo/bug-grep>.  Le logiciel de suivi
+       des   bogues   sur   Savannah   de   grep   est   situé   à   l’adresse
+       <http://savannah.gnu.org/bugs/?group=grep>.
+
+   Bogues connus
+       Dans  les  constructions {n,m} de grandes valeurs de répétition peuvent
+       pousser grep à  utiliser  beaucoup  de  mémoire.  D’autres  expressions
+       rationnelles  tordues peuvent prendre un temps très long et mener à une
+       insuffisance de mémoire.
+
+       Les références arrières sont très lentes et peuvent demander  un  temps
+       très important (exponentiel).
+
+VOIR AUSSI
+
+   Pages de manuel
+       awk(1),  cmp(1),  diff(1),  find(1), gzip(1), perl(1), sed(1), sort(1),
+       xargs(1),  zgrep(1),   mmap(2),   read(2),   pcre(3),   pcrepattern(3),
+       terminfo(5), glob(7), regex(7).
+
+   POSIX Page de manuel du programmeur
+       grep(1p).
+
+   Documentation TeXinfo
+       La  documentation complète de grep est disponible au format TeXinfo. Si
+       info et grep sont correctement installés, la commande
+
+              info grep
+
+       devrait vous donner accès au manuel complet de grep.
+
+NOTES
+
+       GNU’s not Unix, but Unix is a beast; its plural form is Unixen.
+
+TRADUCTION
+
+       Cette page de manuel a été traduite par Christophe Blaess  en  1997  et
+       mise  à jour par Denis Barbier jusqu’en 2005.  La version présente dans
+       Debian est dorénavant maintenue par Luc Froidefond <luc DOT  froidefond
+       AT free DOT fr> et les membres de la liste <debian-l10n-french AT lists
+       DOT debian DOT org>.  Veuillez signaler toute erreur de traduction  par
+       un rapport de bogue sur le paquet manpages-fr-extra.
+

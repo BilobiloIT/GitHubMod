@@ -1,0 +1,98 @@
+man cat 
+
+NOM
+
+       cat - Concaténer des fichiers et les afficher sur la sortie standard
+
+SYNOPSIS
+
+       cat [OPTION]... [FICHIER]...
+
+       Concaténer  le(s)  FICHIER(s) ou l’entrée standard, et les afficher sur
+       la sortie standard.
+
+       -A, --show-all
+              équivalent à -vET
+
+       -b, --number-nonblank
+              numéroter les lignes non vides
+
+       -e     équivalent à -vE
+
+       -E, --show-ends
+              afficher un « $ » à la fin de chaque ligne
+
+       -n, --number
+              numéroter toutes les lignes
+
+       -s, --squeeze-blank
+              supprimer les lignes vides répétées
+
+       -t     équivalent à -vT
+
+       -T, --show-tabs
+              représenter les tabulations par « ^I »
+
+       -u     (ignoré)
+
+       -v, --show-nonprinting
+              utiliser les notations « ^ » et « M- » pour les  caractères  non
+              imprimables à l’exception des sauts de ligne et des tabulations
+
+       --help afficher l’aide-mémoire et quitter
+
+       --version
+              afficher le nom et la version du logiciel et quitter
+
+       L’entrée  standard est lue quand FICHIER est omis ou quand FICHIER vaut
+       « -».
+
+EXEMPLES
+
+       cat FICHIER1 - FICHIER2
+              affiche le contenu de FICHIER1, puis de l’entrée standard,  puis
+              de FICHIER2.
+
+       cat    renvoie l’entrée standard sur la sortie standard.
+
+AUTEUR
+
+       Écrit par Torbjorn Granlund et Richard M. Stallman.
+
+SIGNALER DES BOGUES
+
+       Signaler toute anomalie de cat à bug-coreutils@gnu.org
+       Page           d’accueil           de          GNU          coreutils :
+       <http://www.gnu.org/software/coreutils/>
+       Aide    générale    sur    l’utilisation    des     logiciels     GNU :
+       <http://www.gnu.org/gethelp/>
+       Signaler     toute     erreur     de     traduction     de     cat    à
+       <http://translationproject.org/team/>
+
+COPYRIGHT
+
+       Copyright © 2009 Free Software Foundation, Inc.  Licence  GPLv3+ :  GNU
+       GPL version 3 ou supérieures <http://gnu.org/licenses/gpl.html>
+       Ce  programme  est  un  logiciel  libre.  Vous pouvez le modifier et le
+       redistribuer. Il n’y a AUCUNE GARANTIE dans la mesure autorisée par  la
+       loi.
+
+VOIR AUSSI
+
+       La  documentation  complète  pour  cat  est  disponible  dans un manuel
+       Texinfo. Si les programmes info et cat sont correctement installés  sur
+       votre système, la commande
+
+              info coreutils 'cat invocation'
+
+       devrait vous donner accès au manuel complet (en anglais).
+
+TRADUCTION
+
+       Cette  page de manuel a été traduite par Michel Robitaille <robitail AT
+       iro DOT umontreal DOT ca> et mise  à  jour  pour  Debian  par  Guilhelm
+       Panaget  <guilhelm  DOT  panaget  AT  free DOT fr> et les membres de la
+       liste <debian-l10n-french AT  lists  DOT  debian  DOT  org>.   Veuillez
+       signaler  toute  erreur  de  traduction  par un rapport de bogue sur le
+       paquet manpages-fr-extra.
+
