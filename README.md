@@ -32,4 +32,6 @@
     ifconfig: Affiche les informations sur les interfaces réseau.
     ping: Envoie des paquets ICMP à une adresse pour tester la connectivité réseau.
 
-N'oubliez pas que les options et les paramètres peuvent être ajoutés à ces commandes pour personnaliser leur comportement. Utilisez la commande man suivie du nom de la commande pour obtenir plus d'informations sur son utilisation.
+Commandes sans paramètres 
+man {commande} : sert à afficher les paramètres d'une commande exemple 
+man {ping} affiche le synopsis de la commande ainsi que la description de la commande
