@@ -1,5 +1,5 @@
 # GitHubMod
- Test readme 
+ Liste Commande de linux sans paramètre  
  
     ls: Affiche le contenu du répertoire actuel.
     cd: Change le répertoire de travail.
