@@ -1,0 +1,183 @@
+man du
+
+NOM
+
+       du - Évaluer l’espace disque occupé par des fichiers
+
+SYNOPSIS
+
+       du [OPTION]... [FICHIER]...
+       du [OPTION]... --files0-from=FICHIER
+
+       Totaliser   l’espace  disque  utilisé  par  chaque  FICHIER,  de  façon
+       récursive pour les répertoires.
+
+       Les paramètres obligatoires pour les options de forme  longue  le  sont
+       aussi pour les options de forme courte.
+
+       -a, --all
+              afficher  le volume de tous les fichiers, et pas seulement celui
+              des répertoires
+
+       --apparent-size
+              afficher les volumes effectifs, au lieu de l’espace  occupé  sur
+              le  disque.  Même  si le volume effectif est habituellement plus
+              faible, il peut être plus important en raison de trous dans  des
+              fichiers  « discontinus »,  de fragmentation, de blocs indirects
+              ou pour d’autres raisons similaires.
+
+       -B, --block-size=TAILLE
+              utiliser la TAILLE de bloc
+
+       -b, --bytes
+              équivalent à « --apparent-size --block-size=1 »
+
+       -c, --total
+              calcule le total général
+
+       -D, --dereference-args
+              ne déréférencer  que  les  liens  symboliques  de  la  ligne  de
+              commande
+
+       --files0-from=FICHIER
+              totaliser  l’espace occupé sur le disque par les éléments listés
+              dans FICHIER.  Les  noms  indiqués  dans  FICHIER  doivent  être
+              terminés  par le caractère NUL. Si FICHIER est -, alors les noms
+              sont lus depuis l’entrée standard.
+
+       -H     équivalent à --dereference-args (-D)
+
+       -h, --human-readable
+              afficher les tailles dans un format lisible par un  humain  (par
+              exemple 1K 234M 2G)
+
+       --si   identique à « -h », mais utiliser des puissances 1000 au lieu de
+              1024
+
+       -k     identique à --block-size=1K
+
+       -l, --count-links
+              comptabiliser les tailles plusieurs fois dans le cas  des  liens
+              physiques
+
+       -m     identique a « --block-size=1M »
+
+       -L, --dereference
+              déréférencer tous les liens symboliques
+
+       -P, --no-dereference
+              ne  pas  suivre les liens symboliques. Il s’agit du comportement
+              par défaut.
+
+       -0, --null
+              terminer chaque ligne produite par un caractère NUL (code  ASCII
+              zéro) plutôt que par un retour à la ligne
+
+       -S, --separate-dirs
+              ne pas inclure la taille des sous-répertoires
+
+       -s, --summarize
+              afficher seulement un total pour chaque paramètre
+
+       -x, --one-file-system
+              ignorer  les  répertoires  situés  sur  un  système  de fichiers
+              différent
+
+       -X, --exclude-from=FIXHIER
+              exclure les fichiers qui correspondent à un  des  motifs  listés
+              dans FICHIER
+
+       --exclude=MOTIF
+              exclure les fichiers qui correspondent à MOTIF
+
+       --max-depth=NIVEAU
+              afficher l’espace total occupé par un répertoire (ou un fichier,
+              avec l’option --all) seulement s’il est situé à  une  profondeur
+              inférieure  ou  égale  à  NIVEAU  par rapport au paramètre de la
+              ligne   de   commande.   «--max-depth=0 »   est   équivalent   à
+              « --summarize ».
+
+       --time afficher  l’heure  de la dernière modification de chaque fichier
+              et de chaque sous-répertoire
+
+       --time=MODE
+              afficher un des indicateurs temporels disponibles.  L’indicateur
+              à  afficher  est précisé par MOT, parmi : « atime », « access »,
+              « use », «ctime » ou « status »
+
+       --time-style=STYLE
+              afficher  les  heures  en  utilisant  le  STYLE :  « full-iso »,
+              « long-iso »,   « iso »,   « +FORMAT ».  La  chaîne  FORMAT  est
+              interprétée de la même façon qu’avec la commande « date ».
+
+       --help afficher l’aide-mémoire et quitter
+
+       --version
+              afficher le nom et la version du logiciel et quitter
+
+       Les valeurs affichées sont exprimées dans la première unité fournie par
+       la  TAILLE  de  l’option  --block-size ou les variables d’environnement
+       DU_BLOCK_SIZE, BLOCK_SIZE ou BLOCKSIZE. Sinon, l’unité par  défaut  est
+       de 1024 octets (ou 512 octets si POSIXLY_CORRECT est activé).
+
+       TAILLE  peut  être  une  des  unités  suivantes :  KB  1000, K 1024, MB
+       1000*1000, M 1024*1024 et ainsi de suite pour G, T, P, E, Z, Y.  Taille
+       peut  également  être  un  entier  suivi  optionnellement  par l’un des
+       suffixes ci-dessus.
+
+MOTIFS
+
+       MOTIF est une chaîne de caractères pouvant comporter les métacaractères
+       usuels   du  shell  (mais  il  ne  peut  pas  s’agir  d’une  expression
+       rationnelle). Le métacaractère ? correspond à un caractère  quelconque,
+       tandis que * correspond à n’importe quelle chaîne (composée de zéro, un
+       ou plusieurs caractères).  Par  exemple,  *.o  correspond  à  tous  les
+       fichiers dont le nom se termine par .o. Ainsi, la commande :
+
+              du --exclude='*.o'
+
+       ignore  tous les fichiers et répertoires dont le nom se termine par .o.
+       Cela inclut éventuellement le fichier .o lui-même
+
+AUTEUR
+
+       Écrit par Torbjorn  Granlund,  David  MacKenzie,  Paul  Eggert  et  Jim
+       Meyering.
+
+SIGNALER DES BOGUES
+
+       Signaler toute anomalie de du à bug-coreutils@gnu.org
+       Page           d’accueil           de          GNU          coreutils :
+       <http://www.gnu.org/software/coreutils/>
+       Aide    générale    sur    l’utilisation    des     logiciels     GNU :
+       <http://www.gnu.org/gethelp/>
+       Signaler     toute     erreur     de     traduction     de     du     à
+       <http://translationproject.org/team/>
+
+COPYRIGHT
+
+       Copyright © 2009 Free Software Foundation, Inc.  Licence  GPLv3+ :  GNU
+       GPL version 3 ou supérieures <http://gnu.org/licenses/gpl.html>
+       Ce  programme  est  un  logiciel  libre.  Vous pouvez le modifier et le
+       redistribuer. Il n’y a AUCUNE GARANTIE dans la mesure autorisée par  la
+       loi.
+
+VOIR AUSSI
+
+       La  documentation  complète  pour  du  est  disponible  dans  un manuel
+       Texinfo. Si les programmes info et du sont correctement  installés  sur
+       votre système, la commande
+
+              info coreutils 'du invocation'
+
+       devrait vous donner accès au manuel complet (en anglais).
+
+TRADUCTION
+
+       Cette  page de manuel a été traduite par Michel Robitaille <robitail AT
+       iro DOT umontreal DOT ca> et mise à jour pour Debian par Valéry  Perrin
+       <valery  DOT  perrin  DOT  debian  AT free DOT fr> et les membres de la
+       liste <debian-l10n-french AT  lists  DOT  debian  DOT  org>.   Veuillez
+       signaler  toute  erreur  de  traduction  par un rapport de bogue sur le
+       paquet manpages-fr-extra.
+

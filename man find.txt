@@ -1,0 +1,1623 @@
+man find
+
+
+NOM
+
+       find - Rechercher des fichiers dans une hiérarchie de répertoires
+
+SYNOPSIS
+
+       find   [-H]  [-L]  [-P]  [-D  option-debogage]  [-Oniveau]  [chemin...]
+       [expression]
+
+       Cette page de manuel  documente  la  version  GNU  de  find.  GNU  find
+       parcourt  les  arborescences  des  répertoires  de  chacun  des chemins
+       mentionnés, en évaluant les expressions fournies  pour  chaque  fichier
+       rencontré.  L’évaluation de l’expression se fait de gauche à droite, en
+       suivant les règles de priorité décrites  dans  la  section  OPÉRATEURS,
+       jusqu’à  l’obtention  du  résultat  (par  exemple  la partie gauche est
+       fausse pour un opérateur et, vraie pour un  opérateur  ou),  puis  find
+       passe au nom de fichier suivant.
+
+       Si vous utilisez find dans un environnement dans lequel la sécurité est
+       importante (si vous l’utilisez par exemple pour  faire  des  recherches
+       dans  des  répertoires  qui  sont  accessibles  en  écriture à d’autres
+       utilisateurs),   vous   devriez    lire    le    chapitre    « Security
+       Considerations » de la documentation de findutils. Cette documentation,
+       fournie par findutils,  s’appelle  Finding  Files  (en  anglais).  Elle
+       contient  bien  plus  de  détails  et  d’explications que cette page de
+       manuel, et peut donc être considérée comme  une  source  d’informations
+       plus utile.
+
+OPTIONS
+
+       Les   options   -H,  -L  et  -P  contrôlent  le  traitement  des  liens
+       symboliques. Les paramètres de la ligne de  commande  qui  les  suivent
+       sont considérés comme des fichiers ou des répertoires à examiner, et ce
+       jusqu’au premier paramètre qui commence par « - », « ( » ou  « ! ».  Ce
+       paramètre, et tous ceux qui suivent, sont considérés comme décrivant ce
+       qui doit être recherché.  Si  aucun  chemin  n’est  précisé,  c’est  le
+       répertoire  courant qui est utilisé. Si aucune expression n’est donnée,
+       c’est l’ordre -print qui est utilisé (quoi qu’il en soit, vous  devriez
+       plutôt utiliser -print0).
+
+       Cette  page  de  manuel  décrit les « options » contenues dans la liste
+       d’expressions. Ces options contrôlent le comportement de find mais sont
+       indiquées  immédiatement  après  le  dernier  chemin.  Les cinq options
+       «réelles » -H, -L, -P, -D et -O doivent être saisies avant  le  premier
+       chemin,  le  cas  échéant.  Un double tiret -- pourra être utilisé afin
+       d’indiquer que les arguments restants ne sont pas des options  (sachant
+       qu’il  est  en  général  plus  sûr  de  faire  commencer les chemins de
+       recherche par « ./ » ou « / »  lorsque vous utilisez des jokers).
+
+       -P     Ne  jamais  suivre  les  liens  symboliques,  ce  qui   est   le
+              comportement  par  défaut.  Quand  find  analyse  ou affiche les
+              informations concernant un fichier, et que  ce  fichier  est  un
+              lien  symbolique,  les  informations  utilisées  sont celles qui
+              concernent le  lien  symbolique  lui-même  (et  non  le  fichier
+              pointé).
+
+       -L     Suivre  les liens symboliques. Quand find analyse ou affiche les
+              informations concernant un fichier, ce sont celles extraites des
+              caractéristiques  du  fichier vers lequel mène les liens, et non
+              celle du lien lui-même (sauf s’il s’agit d’un lien cassé, ou  si
+              find  est  incapable d’analyser le fichier vers lequel pointe le
+              lien). L’utilisation de cette option implique -noleaf  qui  sera
+              toujours  active  pour  les utilisations ultérieures de l’option
+              -P. Si l’option -L est active  et  que  find  découvre  un  lien
+              symbolique  vers  un  sous-répertoire lors de ses recherches, le
+              sous-répertoire pointé par le lien symbolique sera examiné.
+
+              Quand l’option -L est active,  le  prédicat  -type  correspondra
+              toujours au type du fichier pointé par le lien symbolique plutôt
+              que celui du lien lui-même  (sauf  si  le  lien  symbolique  est
+              cassé).  Les prédicats -lname et -ilname renvoient toujours faux
+              lors de l’utilisation de -L.
+
+       -H     Ne pas suivre les liens symboliques, sauf pour le traitement des
+              paramètres  de  la  ligne  de  commande.  Quand  find analyse ou
+              affiche les informations concernant un fichier, celles qui  sont
+              utilisées  viennent  des  propriétés du lien symbolique lui même
+              (et non du fichier pointé). La seule exception à ce comportement
+              est  lorsqu’un  fichier  indiqué  sur  la  ligne de commande est
+              lui-même un lien symbolique, et que ce lien  peut  être  résolu.
+              Dans  ce  cas,  les informations traitées sont celles du fichier
+              pointé par le lien (autrement  dit,  le  lien  est  suivi).  Les
+              informations  concernant  le  lien  lui-même  sont  utilisées en
+              dernier recours, si le fichier pointé par le lien symbolique  ne
+              peut  être  analysé.  Si l’option -H est active, et que l’un des
+              liens indiqués sur la ligne de commande est un  lien  symbolique
+              pointant  vers  un  répertoire, le contenu de ce répertoire sera
+              analysé  (sachant  bien  sûr  que  l’option  -maxdepth  0   l’en
+              empêcherait).
+
+       Si  plus  d’une  option parmi -H, -L ou -P est indiquée, chacune écrase
+       les précédentes, et c’est la dernière qui  apparaît  sur  la  ligne  de
+       commande  qui  prime sur les autres. Puisque c’est l’option par défaut,
+       on considère que c’est -P qui est active, à  moins  que  -H  ou  -L  ne
+       soient utilisées.
+
+       La version find du GNU évalue souvent des fichiers pendant l’analyse de
+       la ligne de commande, et ce avant qu’une recherche n’ait commencée. Ces
+       options modifient aussi la façon dont les paramètres sont traités. Plus
+       précisément, il existe un certain nombre de  tests  qui  comparent  les
+       fichiers  listés  sur  la  ligne  de  commande  et  le fichier en cours
+       d’analyse. Dans tous les cas de figure,  un  fichier  de  la  ligne  de
+       commande  a  été  analysé  et certaines de ses caractéristiques ont été
+       mémorisées. Si le fichier indiqué est en fait un  lien  symbolique,  et
+       que  l’option  -P  est active (ou que ni -H ni -L n’ont été précisées),
+       alors l’information  qui  sera  utilisée  pour  les  comparaisons  sera
+       extraite  des  propriétés du lien symbolique. Sinon, elle sera extraite
+       des propriétés du fichier pointé par le lien. Si find ne peut suivre le
+       lien  (soit  parce  ce  qu’il ne dispose pas des privilèges suffisants,
+       soit parce que le lien pointe vers un  fichier  inexistant),  alors  ce
+       sont les propriétés du lien lui-même qui seront utilisées.
+
+       Quand  les  options  -H  ou -L sont actives, tout lien symbolique donné
+       comme paramètre à -newer sera déréférencé, et le timestamp utilisé sera
+       celui  du  fichier pointé par le lien symbolique. Ceci s’applique de la
+       même façon à -newerXY, -anewer et -cnewer.
+
+       L’option -follow a le même effet que -L, sauf qu’elle agit à  l’endroit
+       où  elle  apparaît  (c’est  à  dire que si -L n’est pas utilisée et que
+       -follow l’est, tout lien  symbolique  qui  apparaît  sur  la  ligne  de
+       commande  après -follow sera déréférencé, et ceux apparaissant avant ne
+       le seront pas).
+
+       -D options-debogage
+              Afficher des  informations  de  diagnostic,  ce  qui  peut  être
+              pratique pour analyser pourquoi find ne fait pas ce que vous lui
+              demandez. La liste des options de debogage  devra  utiliser  des
+              virgules  comme  séparateurs.  La  compatibilité  des options de
+              debogage n’est pas garantie au fil des versions de findutils. La
+              sortie  de  find  -D help permet d’obtenir la liste complète des
+              options reconnues. Les options de debogage valides comportent
+
+              help   Décrire les options de debogage.
+
+              tree   Afficher l’arbre de l’expression dans sa forme  d’origine
+                     et sa forme optimisée.
+
+              stat   Afficher  des messages dès que des fichiers sont examinés
+                     via les appels systèmes stat et lstat. Le programme  find
+                     tente de limiter ce type d’appels.
+
+              opt    Afficher   des   informations   de   diagnostic  liées  à
+                     l’optimisation de l’arbre de l’expression (voir  l’option
+                     -O).
+
+              rates  Afficher  un  résumé  indiquant  le  nombre  de succès ou
+                     d’échecs de chacun des prédicats.
+
+       -Oniveau
+              Activer  l’optimisation  des   requêtes.   Le   programme   find
+              réorganise  l’ordre  des  tests  afin d’en accélérer l’exécution
+              tout en préservant le résultat exact, c’est-à-dire en évitant de
+              modifier  ceux  qui  ont  des effets de bords. Les optimisations
+              réalisées à chacun des niveaux sont les suivantes.
+
+              0      Équivalent au niveau 1 d’optimisation.
+
+              1      Niveau  d’optimisation  par  défaut.  Il  correspond   au
+                     comportement  habituel. Les expressions sont réorganisées
+                     afin que les tests basés seulement sur  les  noms  (comme
+                     -name  ou -regex par exemple) soient exécutés en premier.
+
+              2      Tous les tests -type ou -xtype sont exécutés  après  ceux
+                     basés uniquement sur le nom des fichiers, mais avant tous
+                     les  tests  qui  traitent  d’informations  stockées  dans
+                     l’inode.  Sur  les versions modernes d’Unix, les types de
+                     fichiers sont récupérés par readdir(), et sont donc  plus
+                     rapides  à évaluer que ceux qui nécessitent de travailler
+                     d’abord sur le fichier.
+
+              3      Dans ce niveau d’optimisation, l’optimiseur  de  requêtes
+                     basé  sur le coût total est activé. L’ordre des tests est
+                     modifié  afin   que   les   tests   les   moins   coûteux
+                     (c’est-à-dire   les  plus  rapides)  soient  exécutés  en
+                     premier, et les  plus  coûteux  exécutés  plus  tard,  si
+                     besoin  est.  À l’intérieur d’un même niveau de coût, les
+                     prédicats sont évalués  plus  ou  moins  tôt  selon  leur
+                     probabilité de succès. Avec l’opérateur -o, les prédicats
+                     qui sont susceptibles de réussir sont évalués  plus  tôt,
+                     et  avec  l’opérateur  -a,  ce  sont  ceux  qui  risquent
+                     d’échouer qui sont évalués plus tôt.
+
+              L’optimiseur basé sur le coût a une idée précise des chances  de
+              succès   de  n’importe  quel  test.  Dans  certains  cas,  cette
+              probabilité prend en compte la nature spécifique  du  test  (par
+              exemple,  l’estimation  de  succès d’un -type f est supérieure à
+              celle  d’un  -type  c).  L’optimiseur  basé  sur  le  coût   est
+              actuellement  en  cours  d’évaluation.  S’il  n’améliore pas les
+              performances de find, il sera de nouveau retiré. Réciproquement,
+              les  optimisations  qui s’avèrent fiables, robustes et efficaces
+              pourront   dans   l’avenir   être   activées   à   des   niveaux
+              d’optimisations  moindres. Toutefois, le comportement par défaut
+              (c’est à dire le niveau d’optimisation 1) ne  sera  pas  modifié
+              dans  les  différentes  versions  de la série 4.3.x. La suite de
+              tests unitaires de findutils est exécutée sur chacun des niveaux
+              d’optimisation  de  find  afin  de s’assurer que le résultat est
+              constant.
+
+EXPRESSIONS
+
+       L’expression  est  constituée  d’options  (affectant   l’ensemble   des
+       opérations  plutôt  que  le  traitement  d’un  fichier  particulier, et
+       renvoyant toujours vrai), de  tests  (renvoyant  une  valeur  vraie  ou
+       fausse),  et  d’actions  (ayant  des  effets  de bords et renvoyant une
+       valeur vraie ou fausse),  tous  ces  éléments  étant  séparés  par  des
+       opérateurs.  Quand  un  opérateur  est manquant, l’opération par défaut
+       -and est appliquée.
+
+       Si l’expression  ne  contient  pas  d’action  autre  que  -prune,  find
+       applique  l’action  -print par défaut à tous les fichiers pour lesquels
+       l’expression est vraie.
+
+   OPTIONS
+       Toutes les options renvoient toujours la  valeur  vraie.  Excepté  pour
+       -daystart,  -follow  et -regextype, elles ont toujours un effet global,
+       même sur les tests indiqués avant l’option. En effet, les options  sont
+       traitées au moment où la ligne de commande est analysée, tandis que les
+       tests ne font rien avant que  les  fichiers  ne  soient  examinés.  Les
+       options  -daystart, -follow et -regextype sont différentes à cet égard,
+       et ne s’appliqueront que sur les tests qui apparaissent plus  tard  sur
+       la  ligne de commande. De ce fait, pour améliorer la lisibilité, il est
+       préférable de les placer au début de  l’expression.  Vous  recevrez  un
+       avertissement dans les autres cas.
+
+       -d     Un  synonyme  de  -depth,  dans  un  but  de  compatibilité avec
+              FreeBSD, NetBSD, MacOS X et OpenBSD.
+
+       -daystart
+              Mesurer les temps (avec -amin, -atime, -cmin, -ctime, -mmin,  et
+              -mtime)  depuis  le  début  de  la  journée plutôt que depuis 24
+              heures. Cette option n’affecte que les tests qui  sont  indiqués
+              plus loin sur la ligne de commande.
+
+       -depth Traiter   d’abord   les  sous-répertoires  avant  le  répertoire
+              lui-même. L’action delete implique aussi -depth.
+
+       -follow
+              Obsolète, utilisez plutôt l’option -L à  la  place.  Déréférence
+              les  liens symboliques. Ceci implique l’option -noleaf. L’option
+              -follow n’affecte que  les  tests  qui  apparaissent  après  son
+              apparition  sur  la  ligne  de  commande.  Sauf  dans  le cas où
+              l’option -H ou -L est indiquée, la position de l’option  -follow
+              change le comportement du prédicat -newer, et tout fichier donné
+              en paramètre de -newer sera déréférencé s’il  s’agit  d’un  lien
+              symbolique.  La  même remarque s’applique à -newerXY, -anewer et
+              -cnewer. De  la  même  façon,  le  prédicat  -type  correspondra
+              toujours au type du fichier pointé par le lien symbolique plutôt
+              que le type du lien lui-même. Les prédicats  -lname  et  -ilname
+              renvoient toujours faux lorsqu’on utilise -follow.
+
+       -help, --help
+              Afficher  un message d’aide concernant l’utilisation de find sur
+              la sortie standard et quitter.
+
+       -ignore_readdir_race
+              Normalement, find affiche un message d’erreur  quand  il  échoue
+              lors de l’analyse d’un fichier. Si vous utilisez cette option et
+              que le fichier est effacé entre le moment où find lit le nom  du
+              fichier  dans le répertoire et celui où il essaye de l’analyser,
+              vous n’obtiendrez aucun message d’erreur. Cela s’applique  aussi
+              aux fichiers et répertoires dont vous avez donné les noms sur la
+              ligne de commande. Cette option prend effet dès le moment où  la
+              ligne  de  commande est lue, ce qui veut dire que vous ne pouvez
+              pas rechercher sur une partie du système de fichiers avec  cette
+              option  activée,  et  sur  une  autre  partie  avec cette option
+              désactivée (si vous devez faire  cela,  vous  utiliserez  plutôt
+              deux commandes find, une avec l’option et l’autre sans).
+
+       -maxdepth n
+              Descendre  au  plus à n niveaux de profondeur des répertoires (n
+              étant un entier positif ou nul), dans les paramètres fournis sur
+              la  ligne de commande. -maxdepth 0 signifie que les tests et les
+              actions  ne  s’appliquent  qu’aux  paramètres  de  la  ligne  de
+              commande.
+
+       -mindepth n
+              Ne  pas  appliquer  les  tests  ou  les actions à des niveaux de
+              profondeur inférieurs à n. n  est  un  entier  positif  ou  nul.
+              -mindepth 1 signifie que les tests et les actions s’appliquent à
+              tous les fichiers sauf aux paramètres de la ligne de commande.
+
+       -mount Ne pas parcourir les répertoires situés sur d’autres systèmes de
+              fichiers. Il s’agit d’une alternative à l’option -xdev, assurant
+              la compatibilité avec d’anciennes versions de find.
+
+       -noignore_readdir_race
+              Désactiver l’effet de -ignore_readdir_race.
+
+       -noleaf
+              Ne pas optimiser, en ignorant que les répertoires sont  supposés
+              contenir deux sous-répertoires de moins que leur nombre de liens
+              physiques. Cette option est nécessaire lorsque l’on parcourt des
+              systèmes  de  fichiers  ne  suivant  pas  les  conventions  Unix
+              concernant les liens de répertoires, comme les systèmes  MS-DOS,
+              les  CD-ROM  ou  les  points  de  montage de volumes AFS. Chaque
+              répertoire sur un système de fichiers Unix  dispose  d’au  moins
+              deux  liens  physiques,  son  nom  et  « . ».  De  plus,  chaque
+              sous-répertoire a également un lien « .. »  vers  le  répertoire
+              parent  (s’il existe). Quand find examine un répertoire, il sait
+              qu’il y a deux sous-répertoires de moins que de  liens  vers  le
+              répertoire.  Une  fois  qu’il  a  rencontré  le  nombre prévu de
+              sous-répertoires, il est donc sûr que le reste des  entrées  est
+              constitué  de  fichiers  autres  que  des  sous-répertoires. Ces
+              fichiers sont des feuilles ([NDT] « leaf ») dans  l’arborescence
+              des répertoires. S’il n’y a que les noms de fichiers à examiner,
+              il n’a plus besoin de vérifier leur nature, ce qui entraîne  une
+              augmentation notable de la vitesse de traitement.
+
+       -regextype type
+              Définir la syntaxe des expressions rationnelles des tests -regex
+              et -iregex qui  seront  indiqués  plus  loin  sur  la  ligne  de
+              commande.  Les  types  actuellement implémentés sont emacs (type
+              par   défaut),   posix-awk,    posix-basic,    posix-egrep    et
+              posix-extended.
+
+       -version, --version
+              Afficher le numéro de version de find et quitter.
+
+       -warn, -nowarn
+              Activer ou désactiver les messages d’avertissement. Ces messages
+              d’avertissement concernent l’usage de la ligne de  commande,  et
+              non  les  événements  que find peut rencontrer lorsqu’il explore
+              les répertoires. Le comportement par défaut est d’activer  -warn
+              si l’entrée standard est un tty, et -nowarn dans les autres cas.
+
+       -xdev  Ne pas parcourir les répertoires situés sur d’autres systèmes de
+              fichiers.
+
+   TESTS
+       Quelques  tests (comme  -newerXYet -samefile par exemple) permettent de
+       comparer le fichier en  cours  d’examen  et  un  fichier  de  référence
+       indiqué  sur  la  ligne  de  commande.  Quand  ces tests sont utilisés,
+       l’analyse du fichier de référence est soumis aux effets des options -H,
+       -L  , -P et tout -follow précédent. Par contre, ce fichier de référence
+       n’est consulté qu’une fois, au moment  où  la  ligne  de  commande  est
+       interprétée.  Si  ce fichier de référence ne peut pas être analysé (par
+       exemple si l’appel système stat(2) échoue), un  message  d’erreur  sera
+       généré,  et la commande find s’interrompera avec un statut différent de
+       zéro.
+
+       Les paramètres numériques peuvent être indiqués comme suit :
+
+       +n     supérieur à n,
+
+       -n     inférieur à n,
+
+       n      strictement égal à n.
+
+       -amin n
+              Dernier accès au fichier il y a n minutes.
+
+       -anewer fichier
+              Dernier  accès  au  fichier  plus   récent   que   la   dernière
+              modification de fichier. Si le fichier est un lien symbolique et
+              que les options -H ou -L sont actives, c’est toujours la date de
+              dernier accès du fichier pointé qui est utilisée.
+
+       -atime n
+              Dernier  accès  au  fichier  il  y  a  n*24 heures. Lorsque find
+              calcule le nombre de périodes de  24  heures  depuis  lequel  le
+              fichier  a  été  accédé,  la  partie  fractionnelle est ignorée.
+              Ainsi, pour correspondre à -atime +1, un fichier doit avoir  été
+              accédé il y a au moins deux jours.
+
+       -cmin n
+              Date  de  dernière  modification  du  statut du fichier il y a n
+              minutes.
+
+       -cnewer fichier
+              Date de dernière modification du statut du fichier plus  récente
+              que  la  date  de  dernière modification du fichier donné. Si le
+              fichier donné est un lien symbolique et que les options -H ou -L
+              sont  actives,  alors  c’est la date de dernière modification du
+              statut du fichier pointé par le lien qui est considérée.
+
+       -ctime n
+              Date de dernière modification du statut du fichier il y  a  n*24
+              heures.   Consultez   l’explication   concernant   -atime   pour
+              comprendre    comment    les    effets    d’arrondis    altèrent
+              l’interprétation  de  la date de dernière modification du statut
+              du fichier.
+
+       -empty Fichier vide. De plus, ce fichier doit être régulier ou être  un
+              répertoire.
+
+       -executable
+              Correspond  aux fichiers qui sont exécutables et aux répertoires
+              qui sont accessibles (en ce qui concerne la résolution d’un  nom
+              de  fichier).  Les  listes  de contrôles d’accès (ACL) et autres
+              artefacts de permissions sont pris en  compte,  à  l’inverse  du
+              test  -perm  qui lui les ignore. Ce test utilise l’appel système
+              access(2) et peut de ce fait être trompé par  les  serveurs  NFS
+              qui  font  de la substitution d’identité (ou du root squashing).
+              En effet, de nombreux systèmes implémentent access(2) au  niveau
+              du  client,  et  ne  peuvent  donc  se  servir des substitutions
+              d’identité gérées du coté serveur. Puisque ce  test  n’est  basé
+              que sur le résultat fourni par l’appel système access(2), il n’y
+              a  aucune  garantie  qu’un  fichier  trouvé  par  ce  test  soit
+              réellement exécutable.
+
+       -false Toujours faux.
+
+       -fstype type
+              Fichier  se trouvant sur un système de fichiers du type indiqué.
+              Les types valides  de  systèmes  de  fichiers  dépendent  de  la
+              version  d’Unix.  Une liste non exhaustive des systèmes acceptés
+              sur certaines versions d’Unix sont : ufs, 4.2,  4.3,  nfs,  tmp,
+              mfs,  S51K, S52K. Vous pouvez utiliser -printf avec la directive
+              %F pour examiner les types de vos systèmes de fichiers.
+
+       -gid n Fichier de GID numérique valant n.
+
+       -group nom_groupe
+              Fichier appartenant  au  groupe  nom_groupe  (éventuellement  un
+              identifiant numérique).
+
+       -ilname motif
+              Semblable à -lname, mais sans différencier les majuscules et les
+              minuscules. Si les options -L ou -follow sont actives,  ce  test
+              renvoie  toujours  faux,  à moins que le lien symbolique ne soit
+              cassé.
+
+       -iname motif
+              Semblable à -name, mais sans différencier les majuscules et  les
+              minuscules.   Par   exemple   les  motifs  « to* »  et  « T??? »
+              correspondent aux noms de fichiers « Toto », « TOTO », « toto »,
+              « tOto »,  etc.  Dans ces motifs, et contrairement à l’expansion
+              des noms de fichiers de l’interpréteur de  commandes,  un  « . »
+              initial  peut correspondre au motif « * ». Ainsi, find -name *to
+              acceptera le  fichier  « .toto ».  Notez  bien  que  vous  devez
+              protéger   les   motifs,   cela   va   sans   dire,  car  sinon,
+              l’interpréteur   de   commandes   appliquera   l’expansion   aux
+              métacaractères qu’ils contiennent.
+
+       -inum n
+              Fichier  dont  le  numéro  d’inode est n. Il est en général plus
+              facile d’utiliser le test -samefile.
+
+       -ipath motif
+              Se comporter  comme  -iwholename.  Cette  option  est  obsolète,
+              veuillez ne plus l’utiliser.
+
+       -iregex motif
+              Semblable à -regex, mais sans différencier les majuscules et les
+              minuscules.
+
+       -iwholename motif
+              Semblable à -wholename, mais la recherche n’est pas  sensible  à
+              la casse.
+
+       -links n
+              Fichier ayant n liens.
+
+       -lname motif
+              Fichier   représentant  un  lien  symbolique,  dont  le  contenu
+              correspond  au  motif  indiqué.  Lors   du   développement   des
+              métacaractères,  « / »  et « .» ne sont pas traités différemment
+              des autres  caractères.  Si  les  options  -L  ou  -follow  sont
+              actives,  ce  test  renvoie faux, sauf si le lien symbolique est
+              cassé.
+
+       -mmin n
+              Fichier dont les données ont été modifiées il y a n minutes.
+
+       -mtime n
+              Fichier dont les données ont été modifiées il y a  n*24  heures.
+              Consultez  l’explication  sur -atime pour comprendre comment les
+              arrondis  affectent  l’interprétation  des  dates  de   dernière
+              modification des fichiers.
+
+       -name motif
+              Fichier  dont  le  nom  de  base (sans les répertoires du chemin
+              d’accès), correspond  au  motif  du  shell.  Les  métacaractères
+              (« * »,  « ? »,  et «[] ») peuvent correspondre à un point « . »
+              au  début  du  nom  du   fichier   (c’est   une   évolution   de
+              findutils-4.2.2,  consultez  la section CONFORMITÉ AUX STANDARDS
+              plus loin). Pour ignorer  un  répertoire,  ainsi  que  tous  ses
+              fichiers,  utilisez  l’option  -prune (vous trouverez un exemple
+              dans la description de l’option -path). Les parenthèses ne  sont
+              pas considérées comme des caractères spéciaux, bien que certains
+              interpréteurs  de  commandes  (dont  le  Bash)  attribuent   aux
+              parenthèses  un  rôle particulier. La correspondance avec le nom
+              du  fichier  est  obtenue  par  l’utilisation  de  la   fonction
+              fnmatch(3)  de  la bibliothèque. N’oubliez pas de protéger votre
+              motif   entre   guillemets   afin   d’éviter   l’expansion   des
+              métacaractères par l’interpréteur de commandes.
+
+       -newer fichier
+              Fichier  modifié  plus  récemment  que le fichier indiqué. Si le
+              fichier fichier est un lien symbolique et que les options -H  ou
+              -L sont actives, c’est la date de modification du fichier pointé
+              qui sera considérée.
+
+       -newerXY rfrence
+              Compare le timestamp  du  fichier  courant  avec  la  rfrence.
+              L’argument  rfrence est habituellement un nom de fichier (dans
+              ce cas, un de ses timestamps est utilisé pour les comparaisons),
+              mais  il peut aussi s’agir d’une chaîne donnant un temps absolu.
+              X et Y sont des emplacements pour d’autres lettres, lettres  qui
+              indiquent  quel  horodatage  de la rfrence est utilisé pour la
+              comparaison.
+
+              a   La date et l’heure de dernier accès au fichier rfrence
+              B   La date et l’heure de création du fichier rfrence
+              c   La date et l’heure de changement d’état de l’inode rfrence
+              m   La date et l’heure de dernière modification du fichier rfrence
+              t   rfrence est directement interprétée en tant qu’heure
+
+              Certaines combinaisons ne sont pas valables, comme par  exemple,
+              X   utilisé   avec   t.   Certaines  combinaisons  ne  sont  pas
+              implémentées sur certains systèmes,  comme  par  exemple  B  qui
+              n’est  pas  supportée  par  tous les systèmes. Une erreur fatale
+              sera retournée si une combinaison non valable ou non implémentée
+              de  XY  est appelée. Les dates et heures sont interprétées comme
+              les arguments de l’option  -d de la commande  date  du  GNU.  Si
+              vous essayez d’utiliser la date de création d’un fichier, et que
+              cette date  de  création  ne  peut  pas  être  déterminée,  vous
+              obtiendrez un message d’erreur fatale. Si vous spécifiez un test
+              qui se réfère à la date de création des fichiers à examiner,  ce
+              test  échouera  pour  chaque  fichier  pour  lequel  la  date de
+              création est inconnue.
+
+       -nogroup
+              Fichier dont l’identifiant de groupe numérique ne  correspond  à
+              aucun groupe d’utilisateurs.
+
+       -nouser
+              Fichier  dont l’UID numérique ne correspond à aucun utilisateur.
+
+       -path motif
+              Fichier  dont  le   nom   correspond   au   motif   motif.   Les
+              métacaractères « / » ou « . » ne sont pas interprétés, d’où, par
+              exemple,
+                        find . -path "./sr*sc"
+              affichera un résultat pour un répertoire  appelé  « ./src/misc »
+              (s’il existe). Pour omettre une branche complète de répertoires,
+              utilisez  -prune  plutôt  que  de  vérifier  chaque  fichier  de
+              l’arborescence.   Pour   ignorer   par   exemple  le  répertoire
+              « src/emacs » et tous ces fichiers et sous-répertoires  tout  en
+              affichant  le  nom  des  autres fichiers trouvés, faites quelque
+              chose comme :
+                        find . -path ’./src/emacs’ -prune -o -print
+              Sachez que le motif de recherche  de  correspondance  s’applique
+              sur  le  nom  complet  du  fichier,  en commençant des points de
+              départ indiqués sur la ligne  de  commande.  L’utilisation  d’un
+              chemin  absolu  n’a  de  sens  ici  que si le point de départ de
+              recherche est lui aussi un chemin absolu. Cela signifie  que  la
+              commande suivante ne trouvera jamais rien :
+                        find bar -path /truc/bidule/monFichier -print
+              Le  prédicat  -path est aussi implémenté dans le find d’HP-UX et
+              apparaîtra dans une prochaine version du standard POSIX.
+
+       -perm mode
+              Fichier dont les autorisations d’accès sont fixées exactement au
+              mode  indiqué  (en  notation  symbolique  ou octale). Puisqu’une
+              correspondance stricte est requise, vous risquez d’être  obligés
+              d’utiliser  une  chaîne  de caractères plutôt compliquée lorsque
+              vous utiliserez cette option avec le mode symbolique. -perm g=w,
+              par  exemple,  ne  recherchera  que les fichiers qui ont le mode
+              0020 (c’est à dire, ceux pour lesquels la permission  d’écriture
+              pour  le  groupe  est la seule permission définie). Vous voudrez
+              plus certainement utiliser les formes « / » ou « - », telles que
+              -perm  -g=w,  qui  correspondent  à tous les fichiers qui ont le
+              droit d’écriture pour les groupes. Consultez la section EXEMPLES
+              pour des exemples plus significatifs.
+
+       -perm -mode
+              Fichier  ayant  tous  les  bits d’autorisations indiqués dans le
+              mode. Les notations symboliques sont acceptées dans ce  cas,  et
+              c’est  en  général  comme  cela  que l’on veut s’en servir. Vous
+              devez indiquer « u », « g » ou «o » si  vous  utilisez  un  mode
+              symbolique. Consultez la section EXEMPLES pour des exemples plus
+              significatifs.
+
+       -perm /mode
+              Fichier ayant certains des bits d’autorisations indiqués dans le
+              mode.  La  notation  symbolique  est  acceptée dans ce cas. Vous
+              devez indiquer « u », « g » ou « o » si vous  utilisez  un  mode
+              symbolique. Consultez la section EXEMPLES pour des exemples plus
+              significatifs. Si aucun bit d’autorisation  n’est  indiqué  dans
+              mode,   cela  correspond  à  tous  les  fichiers (l’objectif est
+              d’être plus cohérent avec le comportement de perm -000).
+
+       -perm +mode
+              Déconseillé, ancienne méthode pour rechercher des fichiers ayant
+              certains  des  bits  d’autorisations indiqués dans le mode. Vous
+              devez plutôt utiliser -perm /mode. L’utilisation de  la  syntaxe
+              « + »  avec  la notation symbolique vous réservera des résultats
+              surprenants. Par exemple, « +u+x » est une  notation  symbolique
+              valide (équivalente à +u,+x, c’est-à-dire 0111) qui ne sera donc
+              pas évaluée en tant que -perm +mode, mais plutôt comme  l’option
+              de  recherche  exacte  -perm  mode.  Cela  correspondra donc aux
+              fichiers avec la permission « 0111 » précisément,  et  non  ceux
+              qui  ont  n’importe  quel  bit  d’exécution  activé.  Si vous ne
+              trouvez pas ce  paragraphe  clair,  vous  n’êtes  pas  le  seul.
+              Utilisez  plutôt  -perm  /mode.  Cet  emploi  du  test -perm est
+              déconseillé  parce   que   la   spécification   POSIX   requiert
+              l’interprétation  du  premier  « + »  en  tant  que partie de la
+              notation symbolique. Nous avons donc  préféré  l’utilisation  de
+              « / ».
+
+       -readable
+              Correspond  aux  fichiers  qui  sont accessibles en lecture. Les
+              listes de contrôle d’accès (ACL)  et  les  autres  artefacts  de
+              permissions  sont pris en compte, à l’inverse du test -perm qui,
+              lui, les ignore. Ce test utilise l’appel système  access(2),  et
+              peut,  de  ce fait, être trompé par les serveurs NFS qui font de
+              la substitution d’identité (UID mapping ou root  squashing).  En
+              effet,  de nombreux systèmes implémentent access(2) au niveau du
+              client,  et  ne  peuvent  donc  se  servir   des   substitutions
+              d’identités gérées du coté serveur.
+
+       -regex motif
+              Nom  de  fichier correspondant à l’expression rationnelle motif.
+              Il s’agit d’une correspondance sur le chemin complet, pas  d’une
+              recherche. Par exemple, pour mettre en correspondance un fichier
+              nommé  « ./fubar3 »,  vous  pouvez  utiliser   les   expressions
+              rationnelles  « .*bar. »  ou « .*b.*3 », mais pas « f.*r3 ». Les
+              expressions rationnelles comprises par find  sont,  par  défaut,
+              celles d’Emacs. L’option -regextype permet d’en changer.
+
+       -samefile nom
+              Fichier  qui  se  réfère  à  la même inode que nom. Quand -L est
+              actif, cela inclut les liens symboliques.
+
+       -size n[cwbkMG]
+              Fichier utilisant n unités  d’espace.  On  pourra  utiliser  les
+              suffixes suivants :
+
+              « b »  Pour  des blocs de 512 octets (comportement par défaut si
+                     rien n’est indiqué).
+
+              « c »  Pour indiquer des octets.
+
+              « w »  Pour des mots de deux octets.
+
+              « k »  Pour des kilo-octets (unités de 1 024 octets).
+
+              « M »  Pour des méga-octets (unités de 1 048 576 octets).
+
+              « G »  Pour des giga-octets (unités de 1 073 741 824 octets).
+
+              La taille ne prend pas en compte les blocs indirects, mais  elle
+              comptabilise  les  blocs  des fichiers creux non encore alloués.
+              Gardez à l’esprit que les spécifications  de  format  « %k »  et
+              « %b »  de  -printf gèrent différemment les fichiers éparpillés.
+              Le suffixe « b » détermine toujours des blocs de 512  octets  et
+              jamais  de 1 kilo-octets, ce qui diffère du comportement de -ls.
+
+       -true  Toujours vrai.
+
+       -type c
+              Fichier du type c :
+
+              b      Fichier spécial en mode bloc (avec tampon)
+
+              c      Fichier spécial en mode caractère (sans tampon)
+
+              d      Répertoire
+
+              p      Tube nommé (FIFO)
+
+              f      Fichier régulier
+
+              l      Lien symbolique, n’est jamais vrai si les options  -L  ou
+                     -follow  sont  actives, à moins que le lien symbolique ne
+                     soit  cassé.  Si  vous  voulez   rechercher   des   liens
+                     symboliques alors que -L est actif, utilisez -xtype.
+
+              s      Socket
+
+              D      Door (Solaris)
+
+       -uid n Fichier dont l’identifiant utilisateur numérique vaut n.
+
+       -used n
+              Fichier  dont  le dernier accès date de n jours après sa date de
+              dernière modification.
+
+       -user utilisateur
+              Fichier  appartenant  à   l’utilisateur   indiqué   (identifiant
+              utilisateur numérique éventuellement).
+
+       -wholename motif
+              Voir -path. Cette option est moins portable que -path.
+
+       -writable
+              Correspond  aux  fichiers  qui sont accessibles en écriture. Les
+              listes de contrôle d’accès (ACL)  et  les  autres  artefacts  de
+              permissions  sont pris en compte, à l’inverse du test -perm qui,
+              lui, les ignore. Ce test utilise l’appel système  access(2),  et
+              peut,  de  ce fait, être trompé par les serveurs NFS qui font de
+              la substitution d’identité (UID mapping ou root  squashing).  En
+              effet,  de nombreux systèmes implémentent access(2) au niveau du
+              client,  et  ne  peuvent  donc  se  servir   des   substitutions
+              d’identités gérées du coté serveur.
+
+       -xtype c
+              Semblable  à  -type  sauf  si le fichier est un lien symbolique.
+              Pour les liens symboliques, si les options  -H  ou  -P  ont  été
+              spécifiées,  le  test  est vrai si le fichier pointé par le lien
+              est de type c ; si l’option -L a été spécifiée, le test est vrai
+              si  c  vaut  « l ».  Autrement  dit, pour les liens symboliques,
+              -xtype vérifie le  type  des  fichiers  que  l’option  -type  ne
+              vérifie pas.
+
+   ACTIONS
+       -delete
+              Effacer les fichiers, et renvoyer vrai si l’effacement a réussi.
+              Si l’effacement échoue,  un  message  d’erreur  est  envoyé.  Si
+              -delete  échoue,  le  statut de sortie de find sera différent de
+              zéro (si jamais  il  s’interrompt).  L’utilisation  de  l’action
+              -delete active automatiquement l’option -depth.
+
+              Attention :  N’oubliez  pas que la ligne de commande de find est
+              évaluée comme une expression. Écrire -delete en premier  forcera
+              find  à  essayer d’effacer tout ce qui se trouve dans les points
+              de départ que vous avez indiqué. Lorsque vous testez  une  ligne
+              de commande de find qui utilisera -delete, vous devriez préciser
+              l’option -depth afin d’éviter les surprises plus  tard.  Puisque
+              -delete  entraîne  -depth,  vous  ne pouvez pas utiliser en même
+              temps -prune et -delete.
+
+       -exec commande ;
+              Exécuter la commande ; vrai si le code de retour 0 est  renvoyé.
+              Tous  les  paramètres qui suivent find sont considérés comme des
+              paramètres pour la ligne de commande, jusqu’à la rencontre  d’un
+              caractère  « ; ».  La  chaîne  «{} » est remplacée par le nom du
+              fichier en cours de traitement, ceci dans toutes ses occurrences
+              sur  la ligne de commande, et pas seulement aux endroits où elle
+              est isolée, comme c’est le cas avec d’autres versions  de  find.
+              Ces  deux  chaînes  peuvent  avoir  besoin  d’être  protégées du
+              développement de la ligne de commande par le shell, en utilisant
+              le  caractère  d’échappement  (« \ »)  ou une protection par des
+              guillemets. Consultez la  section  EXEMPLES  pour  des  exemples
+              d’utilisation  de  l’option  -exec.  La  commande  indiquée  est
+              exécutée à chaque fois qu’un fichier correspond. La commande est
+              exécutée depuis le répertoire de départ. Il existe d’inévitables
+              problèmes de sécurité associés  à  l’usage  de  l’option  -exec,
+              c’est  pourquoi  vous  devriez  utiliser  l’option -execdir à la
+              place.
+
+       -exec commande {} +
+              Cette variante de l’option -exec exécute la  commande  spécifiée
+              sur  le  fichier  sélectionné, mais en ajoutant le nom de chaque
+              fichier trouvé à la fin de la ligne de commande. Le nombre total
+              d’invocation  de  la commande sera donc très inférieur au nombre
+              de fichiers trouvés. La ligne de commande est  construite  à  la
+              manière  de  xargs.  Une  seule instance de « {} » est permise à
+              l’intérieur de la commande. La commande sera  exécutée  dans  le
+              répertoire de départ.
+
+       -execdir commande ;
+
+       -execdir commande {} +
+              Semblable à -exec, sauf que la commande indiquée sera exécutée à
+              partir du sous-répertoire contenant  le  fichier  correspondant,
+              qui  n’est normalement pas celui à partir duquel vous avez lancé
+              find.  C’est  une  méthode  bien  plus  fiable  d’invocation  de
+              commande,  puisqu’elle  évite  des  conflits  de  résolution  de
+              chemins des fichiers trouvés.  Comme  pour  l’option  -exec,  la
+              forme de -execdir avec « + » construira une ligne de commande de
+              telle sorte qu’elle pourra traiter plusieurs fichiers trouvés en
+              une  passe  (avec une restriction, chaque invocation de commande
+              ne portera que sur une liste de fichiers issue d’un seul et même
+              répertoire).  Si  vous  utilisez cette option, veillez bien à ce
+              que votre variable d’environnement $PATH ne  contienne  pas  une
+              référence au répertoire courant  « . », sinon un pirate pourrait
+              lancer toutes les commandes qu’il souhaite en mettant un fichier
+              au  nom  adéquat  dans  les  répertoires où vous allez lancer un
+              -execdir. De la même manière, évitez les références vides ou les
+              noms de répertoires exprimés en relatif dans $PATH.
+
+       -fls fichier
+              Vrai ;  semblable  à  -ls,  mais écrire dans le fichier comme le
+              fait -fprint. Le fichier en sortie est toujours créé, même si le
+              prédicat  n’est  jamais  vérifié.  Consultez  la section NOMS DE
+              FICHIERS PEU COURANTS  pour  obtenir  des  informations  sur  la
+              gestion des caractères inhabituels dans les noms de fichier.
+
+       -fprint fichier
+              Vrai ;  écrire  le  nom  complet  dans  le  fichier.  Si fichier
+              n’existe pas au démarrage de find, il est créé. S’il existe,  il
+              est   écrasé.   Les   noms   de   fichier   « /dev/stdout »   et
+              « /dev/stderr »  sont  traités  de  manière  particulière,   ils
+              correspondent respectivement à la sortie standard et à la sortie
+              d’erreurs. Le fichier de sortie est toujours crée,  même  si  le
+              prédicat  n’est  jamais  vérifié.  Consultez  la section NOMS DE
+              FICHIERS PEU COURANTS  pour  obtenir  des  informations  sur  la
+              gestion des caractères inhabituels dans les noms de fichiers.
+
+       -fprint0 fichier
+              Vrai ;  semblable à -print0 mais écrire dans le fichier comme le
+              fait -fprint. Le fichier de sortie est toujours créé, même si le
+              prédicat  n’est  jamais  vérifié.  Consultez  la section NOMS DE
+              FICHIERS PEU COURANTS  pour  obtenir  des  informations  sur  la
+              gestion des caractères inhabituels dans les noms de fichiers.
+
+       -fprintf fichier format
+              Vrai ;  semblable à -printf mais écrire dans le fichier comme le
+              fait -fprint. Le fichier de sortie est toujours créé, même si le
+              prédicat  n’est  jamais  vérifié.  Consultez  la section NOMS DE
+              FICHIERS PEU COURANTS  pour  obtenir  des  informations  sur  la
+              gestion des caractères inhabituels dans les noms de fichiers.
+
+       -ls    Vrai,  afficher  le  nom  du  fichier en cours dans le format ls
+              -dils sur la sortie standard. La taille est calculée en blocs de
+              1 Ko, à moins que la variable d’environnement POSIXLY_CORRECT ne
+              soit positionnée, auquel cas la taille est calculée en blocs  de
+              512  octets.  Consultez la section NOMS DE FICHIERS PEU COURANTS
+              pour obtenir des informations  sur  la  gestion  des  caractères
+              inhabituels dans les noms de fichier.
+
+       -ok commande ;
+              Comme   -exec   mais   interroger   d’abord   l’utilisateur.  Si
+              l’utilisateur aquiesce, la commande est lancée. Sinon,  le  test
+              devient faux. Si la commande est lancée, son entrée standard est
+              redirigée depuis /dev/null.
+
+              La réponse à la question posée est comparée à  deux  expressions
+              rationnelles  afin  de  déterminer  s’il  s’agit  d’une  réponse
+              positive ou négative. Ces expressions rationnelles sont  données
+              par  le système si la variable d’environnement ‘POSIXLY_CORRECT’
+              est définie,  et dans le cas contraire, dans les traductions des
+              messages   de   find.   Si  le  système  n’a  aucune  définition
+              appropriée,  les propres définitions de find  seront  utilisées.
+              Dans   tous   les   cas,  l’interprétation  de  ces  expressions
+              rationnelles sera modifiée  par  les  variables  d’environnement
+              ’LC_CTYPE’  (classe  de caractères) et  ’LC_COLLATE’ (caractères
+              étendues et équivalencede classes).
+
+       -okdir commande ;
+              Comme -execdir mais interroge d’abord l’utilisateur  comme  dans
+              le  cas  de  -ok.   Si  l’utilisateur  n’acquiesce  pas, le test
+              devient faux. Si la commande est lancée, son entrée standard est
+              redirigée depuis /dev/null.
+
+       -print Vrai ;  afficher  le  nom  complet  du  fichier  sur  la  sortie
+              standard, suivi d’un saut de ligne. Si vous redirigez la  sortie
+              standard de find vers un autre programme et qu’il y a la moindre
+              chance qu’un des noms des fichiers que vous recherchez contienne
+              un  saut  de  ligne,  alors vous devriez très sérieusement opter
+              pour l’option -print0 plutôt que -print.  Consultez  la  section
+              NOMS  DE FICHIERS PEU COURANTS pour obtenir des informations sur
+              la gestion des caractères inhabituels dans les noms de  fichier.
+
+       -print0
+              Vrai ;  afficher  le  nom  complet  du  fichier  sur  la  sortie
+              standard, suivi d’un caractère nul (à la place du caractère saut
+              de  ligne  que -print utilise). Ceci permet aux fichiers dont le
+              nom contient un saut de ligne ou d’autres  types  de  caractères
+              non   affichables,   d’être  correctement  interprétés  par  les
+              programmes utilisant les données en sortie de find. Cette option
+              correspond à l’option -0 de xargs.
+
+       -printf format
+              Vrai ;  afficher  le  format  indiqué sur la sortie standard, en
+              interprétant les séquences d’échappement « \ » et les directives
+              « %».  La  largeur  et  la  précision  des  champs  peuvent être
+              spécifiés comme dans la fonction  « printf » du langage C. Notez
+              bien que la plupart des champs sont affichés selon %s plutôt que
+              %d,  ce  qui  veut  dire  que  les  drapeaux  ne  fonctionneront
+              peut-être  pas comme vous vous y attendiez. Cela veut aussi dire
+              que le drapeau « - » fonctionnera  (il  force  l’alignement  des
+              champs  à  gauche). Contrairement à -print, -printf n’ajoute pas
+              de  saut  de  ligne  à  la  fin  de  la  chaîne.  Les  séquences
+              d’échappement et les directives sont les suivantes :
+
+              \a     Sonnerie.
+
+              \b     Effacement arrière (Backspace).
+
+              \c     Arrêter  immédiatement l’impression du format et vider le
+                     flux de sortie.
+
+              \f     Saut de page.
+
+              \n     Saut de ligne.
+
+              \r     Retour chariot.
+
+              \t     Tabulation horizontale.
+
+              \v     Tabulation verticale.
+
+              \0     Caractère ASCII NUL.
+
+              \\     Un caractère « \ » littéral.
+
+              \NNN   Le caractère ASCII dont le code est NNN (en octal).
+
+              Un « \ » suivi de n’importe  quel  autre  caractère  est  traité
+              comme  un  caractère ordinaire ; ils sont donc affichés tous les
+              deux.
+
+              %%     Un caractère pourcentage littéral (%).
+
+              %a     Date du dernier accès au fichier, dans le format  renvoyé
+                     par la fonction C ctime(3).
+
+              %Ak    Date du dernier accès au fichier, dans le format spécifié
+                     par k, qui doit être soit un « @ »,  soit  une  directive
+                     pour  la fonction C « strftime». Les valeurs possibles de
+                     k sont indiquées ci-dessous, certaines  d’entre-elles  ne
+                     sont  pas  disponibles sur tous les systèmes, à cause des
+                     différences entre les fonctions « strftime »  existantes.
+
+                      @      Secondes  écoulées  depuis  le 1er janvier 1970 à
+                             00 h 00 GMT, avec une partie décimale.
+
+                     Champs horaires :
+
+                      H      Heure (00..23)
+
+                      I      Heure (01..12)
+
+                      k      Heure (0..23)
+
+                      l      Heure (1..12)
+
+                      M      Minute (00..59)
+
+                      p      AM ou PM, avec la désignation locale
+
+                      r      Heure au format 12 heures (hh:mm:ss [AP]M)
+
+                      S      Seconde (00.00  ..  61.00).  Accepte  une  partie
+                             décimale.
+
+                      T      Heure au format 24 heures (hh:mm:ss)
+
+                      +      La  date  et  l’heure,  séparées  par  un  « + »,
+                             « 2004-04-28+22:22:05 » par exemple. Ceci est une
+                             extension  GNU.  L’heure  est donnée dans la zone
+                             horaire courante (qui peut être modifiée  via  la
+                             variable  d’environnement  TZ).  Le  second champ
+                             contient une partie décimale.
+
+                      X      Représentation locale de l’heure (H:M:S)
+
+                      Z      Fuseau horaire (par exemple MET), ou rien  si  le
+                             fuseau horaire est indéterminé.
+
+                     Champs de date :
+
+                      a      Abréviation   locale   du   jour  de  la  semaine
+                             (lun..dim)
+
+                      A      Nom local  entier  du  jour  de  la  semaine,  de
+                             longueur variable (lundi..dimanche)
+
+                      b      Abréviation locale du mois (jan..déc)
+
+                      B      Nom  local  entier  du mois, de longueur variable
+                             (janvier..décembre)
+
+                      c      Date et heure locale (Sat  Nov  04  12:02:33  EST
+                             1989).  Le  format  utilisé  est le même que pour
+                             ctime(3), et, afin de préserver la  compatibilité
+                             avec  ce  format, il n’y a pas de partie décimale
+                             pour les secondes.
+
+                      d      Quantième du mois (01..31)
+
+                      D      Date (mm/jj/aa)
+
+                      h      Identique à b
+
+                      j      Jour de l’année (001..366)
+
+                      m      Mois (01..12)
+
+                      U      Numéro de la semaine dans l’année,  les  semaines
+                             commençant le dimanche (00..53)
+
+                      w      Jour de la semaine (0..6)
+
+                      W      Numéro  de  la semaine dans l’année, les semaines
+                             commençant le lundi (00..53)
+
+                      x      Représentation locale de la date (mm/jj/aa)
+
+                      y      Les deux derniers chiffres de l’année (00..99)
+
+                      Y      Année (1970...)
+
+              %b     Taille de l’espace disque consommé  par  le  fichier,  en
+                     nombre  de  blocs  de 512 octets. Puisque l’espace disque
+                     est alloué par multiple de la taille d’un bloc du système
+                     de  fichiers,  on obtient souvent un résultat supérieur à
+                     %s/512. Il peut aussi être inférieur si  le  fichier  est
+                     creux (sparse file).
+
+              %c     Date  de dernière modification du statut du fichier, dans
+                     le format renvoyé par la fonction C « ctime ».
+
+              %Ck    Date de dernière modification du statut du fichier,  dans
+                     le format spécifié par k, comme pour la directive %A.
+
+              %d     Profondeur    du    fichier   dans   l’arborescence   des
+                     répertoires, 0 signifiant que le fichier est un paramètre
+                     de la ligne de commande.
+
+              %D     Le numéro du périphérique sur lequel le fichier est rangé
+                     (la valeur du champ st_dev field de  la  structure  stat)
+                     exprimé en décimal.
+
+              %f     Nom  du  fichier,  sans  aucun nom de répertoire (dernier
+                     élément uniquement).
+
+              %F     Type de système de  fichiers  sur  lequel  se  trouve  le
+                     fichier.  Cette  valeur  peut être utilisée pour l’option
+                     -fstype.
+
+              %g     Nom du groupe propriétaire du fichier, ou identifiant  de
+                     groupe numérique si le groupe n’a pas de nom.
+
+              %G     Identifiant de groupe numérique du fichier.
+
+              %h     Répertoires  en  tête  du  nom  de  fichier (tout sauf la
+                     dernière partie). Si le nom du fichier ne contient aucune
+                     barre  oblique (NDT : slash) (donc si c’est un fichier du
+                     répertoire courant), alors l’option %h rajoutera « .».
+
+              %H     Paramètre de la ligne de  commande  à  partir  duquel  le
+                     fichier a été trouvé.
+
+              %i     Numéro d’inode du fichier (en décimal).
+
+              %k     Taille  du  fichier,  en nombre de blocs de 1 kilo-octet.
+                     Puisque l’espace disque est alloué  par  multiple  de  la
+                     taille  d’un  bloc  du  système  de  fichiers, on obtient
+                     souvent un résultat supérieur à %s/1024.  Il  peut  aussi
+                     être inférieur si le fichier est éparpillé.
+
+              %l     Destination  du lien symbolique (vide si le fichier n’est
+                     pas un lien symbolique).
+
+              %m     Bits d’autorisation d’accès au fichier (en octal).  Cette
+                     option   utilise   les   nombres   « traditionnellement »
+                     utilisés dans la plupart des implémentations d’Unix, mais
+                     si  votre système utilise un ordre inhabituel de la forme
+                     octale des bits de permissions, alors vous observerez une
+                     différence  entre  la valeur réelle des modes du fichiers
+                     et la sortie de %m. On veut  habituellement  un  zéro  en
+                     début  de  ce  nombre,  et  pour  l’obtenir,  vous pouvez
+                     utiliser le drapeau # (« %#m », par exemple).
+
+              %M     Les permissions du fichier (sous forme symbolique,  comme
+                     dans  ls).  Cette directive n’est disponible que dans les
+                     versions de findutils 4.2.5 et suivantes.
+
+              %n     Nombre de liens physiques sur le fichier.
+
+              %p     Nom du fichier.
+
+              %P     Nom du fichier, en retirant le nom du paramètre de  ligne
+                     de commande à partir duquel le fichier a été trouvé.
+
+              %s     Taille du fichier en octets.
+
+              %S     Densité    du    fichier,   calculée   par   la   formule
+                     (TAILLEBLOC*nb_bloc/taille_fichier).  La  valeur  obtenue
+                     pour  un fichier régulier d’une certaine taille dépend du
+                     système d’exploitation. Toutefois, la valeur  normalement
+                     attendue   pour   un  fichier  creux  (sparse  file)  est
+                     inférieure  à  1.0,  tandis  qu’un  fichier  qui  utilise
+                     l’indirection   de   blocs   pourra  obtenir  une  valeur
+                     supérieure à 1.0. La valeur de TAILLEBLOC est  dépendante
+                     du système, mais est souvent de 512 octets. Si le fichier
+                     a une taille nulle, la valeur affichée est indéfinie. Sur
+                     les  systèmes  qui  n’offre pas la gestion des nombres de
+                     blocs, la valeur de la densité du fichier sera de 1.0.
+
+              %t     Date de dernière modification du fichier, dans le  format
+                     renvoyé par la fonction C « ctime ».
+
+              %Tk    Date  de dernière modification du fichier, dans le format
+                     spécifié par k, comme pour la directive %A.
+
+              %u     Nom  du   propriétaire   du   fichier,   ou   identifiant
+                     utilisateur numérique si l’utilisateur n’a pas de nom.
+
+              %U     Identifiant  utilisateur  numérique  du  propriétaire  du
+                     fichier.
+
+              %y     Type du fichier (comme dans ls -l), U pour  type  inconnu
+                     (ce qui ne devrait pas arriver).
+
+              %Y     Type  du  fichier  (comme pour %y), suivi, pour les liens
+                     symbolique, de : L=boucle, N=inexistant.
+
+              Un caractère « % » suivi de n’importe quel autre  caractère  est
+              supprimé,  mais  le  second  caractère est affiché (ne soyez pas
+              trop confiant cependant, car de nouveaux  caractères  de  format
+              pourront  être un jour utilisés). Un «% » à la fin de l’argument
+              de format peut engendrer un comportement aléatoire puisqu’il n’y
+              a  aucun caractère suivant. Ce qui peut être plus ou moins grave
+              suivant les cas.
+
+              Les options %m et %d gèrent les drapeaux #, 0 et +, à  l’inverse
+              des  autres directives, même si elles affichent des nombres. Les
+              autres directives numériques qui ne gèrent pas ces drapeaux sont
+              G,  U,  b,  D,  k  et n. Le drapeau de format « - » est géré, et
+              transforme l’alignement des champs (qui sont par défaut  alignés
+              à droite) en alignement à gauche.
+
+              Consultez  la section NOMS DE FICHIERS PEU COURANTS pour obtenir
+              des informations sur la gestion des caractères inhabituels  dans
+              les noms de fichier.
+
+       -prune Vrai ;  Si le fichier est un répertoire, ne pas le parcourir. Si
+              l’option  -depth  est  utilisée :  faux,  aucun  effet.  Puisque
+              -delete   entraîne   -depth,   vous   ne   pouvez  pas  utiliser
+              conjointement -prune et -delete.
+
+       -quit  Arrêter immédiatement. Tous les processus fils  seront  arrêtés,
+              et  plus  aucun des chemins indiqués sur la ligne de commande ne
+              sera traité. find /tmp/toto /tmp/titi -print  -quit  n’affichera
+              que  /tmp/toto,  par exemple. Toute ligne de commande construite
+              par -execdir ... {} + sera exécutée avant l’arrêt  de  find.  La
+              valeur  de  retour sera ou ne sera pas zéro, selon qu’une erreur
+              ait eu lieu précédemment ou non.
+
+   NOMS DE FICHIERS PEU COURANTS
+       Beaucoup d’actions de find finissent par afficher des données qui  sont
+       sous  le contrôle d’autres utilisateurs. Cela est vrai pour les noms de
+       fichiers, les tailles, les dates de modification et ainsi de suite. Les
+       noms  de  fichiers  posent  des problèmes potentiels puisqu’ils peuvent
+       contenir n’importe quel caractère, à l’exception de  « \0 »  et  « / ».
+       Les  caractères  inhabituels  dans les noms de fichier peuvent produire
+       des résultats inattendus et souvent  indésirables  sur  votre  terminal
+       (modifier   les  définitions  des  touches  de  fonctions  de  certains
+       terminaux, par exemple).  Les  caractères  inhabituels  sont  gérés  de
+       différentes  façons selon les actions, selon la description ci-dessous.
+
+       -print0, -fprint0
+              Affiche toujours exactement le nom de fichier non modifié,  même
+              si la sortie est un terminal.
+
+       -ls, -fls
+              Tout caractère inhabituel est toujours protégé. Les espaces, les
+              barres obliques inverses et les guillemets sont  affichés  selon
+              les  conventions  des  échappements  du  C  (« \f »,« \" »,  par
+              exemple). Tous les autres caractères inhabituels  sont  affichés
+              en  octal.  Tous  les  autres  caractères affichables (en ce qui
+              concerne -ls et -fls, il s’agit  des  caractères  dont  le  code
+              octal est compris entre 041 et 0176) sont affichés en l’état.
+
+       -printf, -fprintf
+              Si la sortie n’est pas un terminal, les caractères sont affichés
+              en l’état. Sinon, le résultat dépend de la  directive  en  cours
+              d’utilisation.  Les directives %D, %F, %g, %G, %H, %Y et %y sont
+              transformées en valeurs non contrôlées par les propriétaires des
+              fichiers,  et  donc imprimées telles quelles. Les directives %a,
+              %b, %c, %d, %i, %k, %m, %M, %n, %s, %t, %u  et  %U  donnent  des
+              valeurs   qui  sont  sous  le  contrôle  des  propriétaires  des
+              fichiers, mais qui ne peuvent pas être  utilisées  pour  envoyer
+              des  données  arbitraires au terminal, elles sont donc imprimées
+              telles quelles. Les  directives  %f,  %h,  %l,  %p  et  %P  sont
+              protégées  par  des guillemets. Cette protection est appliquée à
+              la manière du ls du GNU. Il ne s’agit pas du même  mécanisme  de
+              protection  que  celui  utilisé pour -ls et -fls. Si vous pouvez
+              choisir le format à utiliser pour  la  sortie  de  find,  sachez
+              qu’il  vaut  mieux  utiliser « \0 » plutôt que nouvelle ligne en
+              tant que terminaison, car les noms de fichiers peuvent  contenir
+              des  caractères  espaces  ou  nouvelle  ligne.  Le réglage de la
+              variable d’environnement  ‘LC_CTYPE’  permet de définir la liste
+              des caractères qui doivent être protégés.
+
+       -print, -fprint
+              Les  guillemets  sont gérés à la manière de -printf et -fprintf.
+              Si vous utilisez find dans un script ou dans un  cas  de  figure
+              particulier  dans  lesquels  les fichiers correspondants peuvent
+              avoir des noms arbitraires,  l’utilisation  de  -print0  devrait
+              être préférée à -print.
+
+       Les  actions -ok et -okdir affichent le nom du fichier traité tel qu’il
+       est. Cela pourrait changer dans une version ultérieure.
+
+   OPÉRATEURS
+       Dans l’ordre de priorité décroissante :
+
+       ( expr )
+              Forcer la précédence.  Comme  les  parenthèses  risquent  d’être
+              interprétées   par   le  shell,  vous  devriez  normalement  les
+              protéger. De nombreux exemples de cette page de  manuel  utilise
+              l’antislash  dans  ce  but,  par  exemple « \(...\) » au lieu de
+              « (...) ».
+
+       ! expr Vrai si expr est faux. Ce  caractère  doit  habituellement  être
+              protégé pour éviter d’être interprété par le shell.
+
+       -not expr
+              Identique à ! expr, mais non conforme à la norme POSIX.
+
+       expr1 expr2
+              Deux  expressions  sur  la même ligne sont implicitement reliées
+              par un ET  ; expr2 n’est pas évaluée si expr1 est fausse.
+
+       expr1 -a expr2
+              Identique à expr1 expr2.
+
+       expr1 -and expr2
+              Identique à expr1 expr2, mais non conforme à la norme POSIX.
+
+       expr1 -o expr2
+              OU ; expr2 n’est pas évaluée si expr1 est vraie.
+
+       expr1 -or expr2
+              Identique à expr1 -o expr2, mais non conforme à la norme  POSIX.
+
+       expr1 , expr2
+              Lister ;  expr1  et  expr2  sont toujours évaluées. La valeur de
+              expr1 est annulée, la valeur de la liste est la valeur de expr2.
+              Le  séparateur  virgule  est pratique pour rechercher différents
+              types de choses tout en ne traversant qu’une fois l’arborescence
+              du  système  de  fichiers.  L’action -fprintf peut être utilisée
+              pour récupérer une liste d’éléments variés pour les ranger  dans
+              différents fichiers en sortie.
+
+CONFORMITÉ AUX STANDARDS
+
+       Définissez   la   variable  d’environnement  POSIXLY_CORRECT  pour  une
+       compatibilité au plus proche du standard POSIX. Les  options  suivantes
+       sont définies dans le standard POSIX (IEEE Std 1003.1, Édition 2003) :
+
+       -H     Cette option est gérée.
+
+       -L     Cette option est gérée.
+
+       -name  Cette  option est gérée, mais la conformité à POSIX dépend de la
+              conformité POSIX de la fonction fnmatch(3) de la bibliothèque du
+              système.  À  l’heure  de  findutils-4.2.2, les métacaractères du
+              shell  (« * »,  « ? »  ou  « []»  par  exemple)  trouveront  les
+              fichiers  commençant par « . » (l’interprétation d’IEEE PASC 126
+              l’impose). Ceci diffère des versions précédentes de findutils.
+
+       -type  Gérée. POSIX définit « b », « c », « d », « l », « p », « f » et
+              « s ».  Le  find  du GNU gère aussi « D », ce qui représente une
+              Porte, pour les systèmes d’exploitation qui en fournissent.
+
+       -ok    Gérée. L’interprétation de la réponse est  soumise  aux  schémas
+              (’patterns’)   choisis   grâce   au   réglage   de  la  variable
+              d’environnement    ‘LC_MESSAGES’.    Lorsque     la     variable
+              d’environnement  ‘POSIXLY_CORRECT’ est définie, ces schémas sont
+              obtenus à partir de la définition des réponses  positives  (yes)
+              et   négatives  (no)  du  système.  Consultez  la  documentation
+              nl_langinfo(3) du  système,  et  notamment  YESEXPR  et  NOEXPR.
+              Lorsque  ‘POSIXLY_CORRECT’  n’est  pas  défini, ces schémas sont
+              extraits du propre catalogue de messages de  find.
+
+       -newer Gérée. Si le fichier spécifié est un  lien  symbolique,  il  est
+              toujours   déréférencé.   Ceci  est  différent  du  comportement
+              précédent, qui prenait en compte les valeurs de  temps  du  lien
+              symbolique (consultez la section HISTORIQUE plus loin).
+
+       -perm  Gérée.  Si la variable d’environnement POSIXLY_CORRECT n’est pas
+              définie, quelques arguments de mode d’accès (par exemple  +a+x),
+              bien  que  non  valables  en  POSIX,  sont  gérés  par  souci de
+              compatibilité.
+
+       Autres prédicats
+              Les prédicats -atime, -ctime, -depth,  -group,  -links,  -mtime,
+              -nogroup,  -nouser, -perm, -print, -prune, -size, -user et -xdev
+              sont tous gérés.
+
+       Le standard POSIX définit les parenthèses  « ( »,  « ) »,  la  négation
+       «! » et les opérateurs « and » et « or » (-a, -o).
+
+       Toutes  les  autres  options,  prédicats, expressions et ainsi de suite
+       sont des extensions hors du standard POSIX. Beaucoup de ces  extensions
+       ne sont de toutes façons pas l’apanage du find du GNU.
+
+       Le standard POSIX impose que find détecte les boucles.
+
+              L’utilitaire find doit détecter les boucles infinies, telles que
+              le retour dans un répertoire déjà visité, alors qu’on revient du
+              dernier  fichier rencontré. Quand il détecte une boucle infinie,
+              find doit afficher  un  message  de  diagnostic  sur  la  sortie
+              d’erreur,  et  essayer  de  revenir  à  sa position d’origine ou
+              s’arrêter.
+
+       La commande find du GNU est conforme à cette exigence. Le décompte  des
+       liens  dans  un  répertoire  qui  contient  des  liens  en dur vers des
+       répertoires supérieurs sera souvent inférieur  à  celui  attendu.  Cela
+       peut  être dû au fait que le find du GNU optimise l’accès en évitant de
+       parcourir  un  sous-répertoire  qui  s’avère  être  un  lien  vers   un
+       répertoire  supérieur. Bien que find ne parcourt pas le répertoire dans
+       ce cas  précis,  il  permet  aussi  d’éviter  l’émission  d’un  message
+       d’avertissement.   Cette   façon  de  faire  peut  sembler  génératrice
+       d’erreurs, mais il est peu probable que quiconque puisse réellement  en
+       être  gêné.  Si  l’optimisation du parcours des feuilles (NDT : leaf) a
+       été désactivée avec -noleaf, cette entrée du  répertoire  sera  bel  et
+       bien  parcourue,  et le message d’avertissement émis si nécessaire. Les
+       liens symboliques ne peuvent pas servir à créer de telles boucles  dans
+       le  système  de fichiers, par contre, si les options -L ou -follow sont
+       actives,  alors  un  message  d’avertissement  sera  émis  quand   find
+       rencontrera  une  boucle  de  liens symboliques. Comme pour les boucles
+       contenant des liens en dur, l’optimisation  de  parcours  des  feuilles
+       (NDT :  leaf)  signifie souvent que find sait qu’il n’a pas à appliquer
+       stat() ou chdir() sur le lien symbolique, et donc que ce diagnostic est
+       souvent inutile.
+
+       L’option  -d  est  gérée  pour des raisons de compatibilité avec divers
+       systèmes BSD, mais préférez plutôt  l’utilisation  de  l’option  -depth
+       conforme POSIX.
+
+       Le  positionnement  de  la  variable d’environnement POSIXLY_CORRECT ne
+       modifie pas le comportement des tests -regex or -iregex parce  que  ces
+       tests ne sont pas définis dans le standard POSIX.
+
+VARIABLES D’ENVIRONNEMENT
+       LANG   Fournit une valeur par défaut pour les variables de localisation
+              qui ne sont pas définies ou nulles.
+
+       LC_ALL Si elle contient une chaîne de caractères non vide, remplace les
+              valeurs de toutes les autres variables de localisation.
+
+       LC_COLLATE
+              The  POSIX  standard  specifies  that  this variable affects the
+              pattern matching to be used for the -name option.  GNU find uses
+              the fnmatch(3) library function, and so support for ‘LC_COLLATE’
+              depends on the system library.  This variable also  affects  the
+              interpretation  of  the response to -ok; while the ‘LC_MESSAGES’
+              variable selects  the  actual  pattern  used  to  interpret  the
+              response  to  -ok, the interpretation of any bracket expressions
+              in the pattern will be affected by ‘LC_COLLATE’.
+
+       LC_CTYPE
+              Cette variable contrôle le traitement des classes de  caractères
+              utilisées  dans  les  expressions rationnelles ainsi que dans le
+              test   -name,  si  la  fonction  fnmatch(3)   fournie   par   la
+              bibiiothèque    le    gère.    Cette   variable   altère   aussi
+              l’interprétatiion de toute classe de caractères des  expressions
+              rationnelles  utilisées  pour  analyser  la  réponse  donnée aux
+              questions  posées  par   -ok.    La   variable   d’environnement
+              ‘LC_CTYPE’   modifie   aussi   la   liste   des  caractères  dit
+              non-imprimables  lors  de  l’affichage  des  noms  de  fichiers.
+              Consultez la section ’NOMS DE FICHIERS INHABITUELS’.
+
+       LC_MESSAGES
+              Définit    la    locale    à    utiliser   pour   les   messages
+              internationnalisés.   Lorsque   la   variable    d’environnement
+              ‘POSIXLY_CORRECT’    est    définie,    cela   détermine   aussi
+              l’interprétation des réponses fournies aux questions posées  par
+              l’action -ok.
+
+       NLSPATH
+              Détermine  l’endroit  où  sont rangés les catalogues de messages
+              localisés.
+
+       PATH   Détermine les  répertoires  dans  lesquels  find  cherchera  les
+              exécutables invoqués par -exec, -execdir, -ok et -okdir.
+
+       POSIXLY_CORRECT
+              Détermine  la  taille  des  blocs  utilisés  par -ls et -fls. Si
+              POSIXLY_CORRECT est défini, les blocs sont  des  unités  de  512
+              octets. Sinon, il s’agit d’unités de 1024 octets.
+
+              Setting  this variable also turns off warning messages (that is,
+              implies -nowarn)  by default, because POSIX requires that  apart
+              from  the  output  for  -ok,  all messages printed on stderr are
+              diagnostics and must result in a non-zero exit status.
+
+              Lorsque POSIXLY_CORRECT n’est pas définie, -perm +zzz  est  géré
+              de  la même façon que -perm /zzz, lorsque +zzz n’est pas un mode
+              symbolique valable. Lorsque  POSIXLY_CORRECT  est  définie,  une
+              telle demande est considérée comme une erreur.
+
+              Lorsque  POSIXLY_CORRECT  est  défini,  la réponse aux questions
+              posées par l’action -ok est  analysée  selon  le  catalogue  des
+              messages  du  système,  et  non  selon  les  propres messages du
+              catalogue de find.
+
+       TZ     Modifie le fuseau horaire utilisé dans le  format  de  certaines
+              directives liées au temps dans -printf et -fprintf.
+
+EXEMPLES
+
+       find /tmp -name noyau -type f -print | xargs /bin/rm -f
+
+       Chercher  les fichiers qui s’appellent noyau dans le répertoire /tmp et
+       ses sous-répertoires, puis les effacer. Rappelez-vous que  vous  pouvez
+       rencontrer des problèmes si des noms de fichiers comportent des retours
+       à la ligne, des guillemets simples ou doubles, ou des espaces.
+
+       find /tmp -name noyau -type f -print0 | xargs -0 /bin/rm -f
+
+       Chercher les fichiers qui s’appellent noyau dans le répertoire /tmp  et
+       ses  sous-répertoires,  puis les effacer, en veillant à ce que les noms
+       de fichiers ou de répertoires qui contiennent des retours à  la  ligne,
+       des  guillemets  simples  ou doubles ou des espaces soient correctement
+       traités. Le test -name est prioritaire sur le test -type afin  d’éviter
+       l’appel de stat(2) pour chacun des fichiers.
+
+       find . -type f -exec file '{}' \;
+
+       Exécuter  « file »  sur  chaque  entrée du répertoire courant ou de ses
+       sous-répertoires. Attention à  bien  protéger  les  accolades  par  des
+       guillemets  simples  afin  d’empêcher  leur  interprétation en tant que
+       ponctuation du script shell. De la même  façon,  le  point-virgule  est
+       protégé grâce à une barre oblique inverse, bien que l’apostrophe aurait
+       aussi pu être utilisée.
+
+       find / \
+       \( -perm -4000 -fprintf /root/suid.txt %#m %u %p\n \) , \
+       \( -size +100M -fprintf /root/grand.txt %-10s %p\n \)
+
+       Parcourir le système de fichiers  en  une  seule  passe,  stockant  les
+       fichiers  et  répertoires  en  setuid  dans  /root/suid.txt et les gros
+       fichiers dans /root/grand.txt.
+
+       find $HOME -mtime 0
+
+       Rechercher les fichiers de  votre  répertoire  personnel  qui  ont  été
+       modifiés   lors  des  dernières  vingt-quatre  heures.  Cette  commande
+       s’exprime de cette façon parce que la recherche utilise le résultat  de
+       la  division  entière  par  24  de l’heure de dernière modification (la
+       fraction  horaire  est  donc  perdue).  Ce  qui  veut  dire  que   pour
+       correspondre  à  -mtime  0,  un  fichier  doit avoir une antériorité de
+       modification inférieure à 24 heures.
+
+       find /sbin /usr/sbin -executable \! -readable -print
+
+       Rechercher les fichiers qui offrent le droit d’exécution, mais  qui  ne
+       sont pas lisibles.
+
+       find . -perm 664
+
+       Rechercher  les fichiers qui ont la permission de lire et d’écrire pour
+       leur propriétaire et groupe, et que les autres utilisateurs ne  peuvent
+       que  lire.  Les  fichiers  qui  satisfont  ces  critères,  mais qui ont
+       d’autres bits de permissions activés (par exemple  si  le  fichier  est
+       exécutable) ne seront pas sélectionnés.
+
+       find . -perm -664
+
+       Rechercher  les fichiers qui ont la permission de lire et d’écrire pour
+       leur propriétaire et  leur  groupe,  et  que  les  autres  utilisateurs
+       peuvent  lire,  sans toutefois s’intéresser à la présence d’autres bits
+       de permissions (le bit d’exécution par exemple). Un fichier  ayant  par
+       exemple les droits 0777 sera sélectionné.
+
+       find . -perm /222
+
+       Rechercher  les  fichiers  qui  offrent le droit d’écriture à quelqu’un
+       (son propriétaire, ou son groupe, ou bien encore n’importe qui).
+
+       find . -perm /220
+       find . -perm /u+w,g+w
+       find . -perm /u=w,g=w
+
+       Ces commandes font toutes les trois la même  chose,  mais  la  première
+       utilise  le mode octal pour représenter les modes du fichier, alors que
+       les deux autres se  servent  de  la  forme  symbolique.  Ces  commandes
+       recherchent  tous  les fichiers dans lesquels soit le propriétaire soit
+       le groupe peut écrire. Ces fichiers n’ont pas à offrir  à  la  fois  le
+       droit d’écriture au propriétaire et au groupe, l’un ou l’autre suffira.
+
+       find . -perm -220
+       find . -perm -g+w,u+w
+
+       Ces commandes font toutes deux la même chose,  c’est-à-dire  rechercher
+       les  fichiers  qui  offrent  le  droit d’écriture au propriétaire ainsi
+       qu’au groupe.
+
+       find . -perm -444 -perm /222 ! -perm /111
+       find . -perm -a+r -perm /a+w ! -perm /a+x
+
+       Ces commandes recherchent toutes deux les fichiers  qui  sont  lisibles
+       par tous (perm -444 ou -perm -a+r), ont au moins un des bits d’écriture
+       actif (-perm /222 ou -perm /a+w), mais  qui  ne  sont  exécutables  par
+       personne (respectivement ! -perm /111 et ! -perm /a+x)
+
+       cd /source-dir
+       find . -name .snapshot -prune -o \( \! -name *~ -print0 \)|
+       cpio -pmd0 /dest-dir
+
+       Cette commande copie le contenu de /source-dir dans /dest-dir, sauf les
+       fichiers  et  répertoires  s’appelant  .snapshot  (et  tout  ce  qu’ils
+       contiennent).  Elle  ne  copie pas non plus les fichiers ou répertoires
+       dont le nom finit par  ~,  mais  copie  par  contre  leur  contenu.  La
+       structure  -prune  -o  \(  ... -print0 \) est assez connue. L’idée ici,
+       c’est que l’expression avant -prune  indique  les  fichiers  à  couper.
+       Toutefois, l’action -prune renvoie vrai, donc le -o qui suit n’applique
+       l’expression à sa droite que sur les  répertoires  qui  n’ont  pas  été
+       coupés  (le  contenu  des  répertoires coupés n’est même pas consulté).
+       L’expression à droite du -o est entre parenthèses pour des  raisons  de
+       clarté  uniquement.  L’accent  est  mis  ici  sur  le fait que l’action
+       -print0 ne s’exécute que pour les items qui n’ont pas  été  coupés  par
+       -prune.  Le  «et   »  implicite  entre les conditions de tests est plus
+       prioritaire que le -o, mais les  parenthèses  aident  à  comprendre  ce
+       qu’il se passe ici.
+
+       find repo/ -exec test -d {}/.svn -o -d {}/.git -o -d {}/CVS ; \
+       -print -prune
+
+       Given  the  following  directory  of  projects and their associated SCM
+       administrative  directories,  perform  an  efficient  search  for   the
+       projects’ roots:
+
+       repo/project1/CVS
+       repo/gnu/project2/.svn
+       repo/gnu/project3/.svn
+       repo/gnu/project3/src/.svn
+       repo/project4/.git
+
+       Dans cet exemple, -prune évite l’inutile inspection des répertoires qui
+       ont déjà été découverts (ne cherche pas par exemple  dans  project3/src
+       puisqu’il  a déjà été trouvé dans project3/.svn) tout en s’assurant que
+       les répertoires frères (project2 et project3) le sont.
+
+VALEURS DE RETOUR
+
+       find s’arrête en renvoyant la valeur de retour 0 si tous  les  fichiers
+       ont  été traités avec succès, ou en renvoyant une valeur supérieure à 0
+       si une erreur est survenue. Cette information est  volontairement  très
+       floue.  Considérez  simplement qu’en cas de valeur de retour différente
+       de zéro, vous ne devez pas  vous  fier  à  l’exactitude  des  résultats
+       fournis par find.
+
+VOIR AUSSI
+
+       locate(1),  locatedb(5),  updatedb(1),  xargs(1), chmod(1), fnmatch(3),
+       regex(7), stat(2), lstat(2), ls(1), printf(3),  strftime(3),  ctime(3),
+       Finding Files (en ligne dans Info, ou en version imprimée)
+
+HISTORIQUE
+
+       À l’heure de findutils-4.2.2, les métacaractères du shell (« * », « ? »
+       ou « [] » par exemple) trouveront les  fichiers  commençant  par  « . »
+       parce que l’interprétation d’IEEE POSIX 126 l’impose.
+
+       -perm  /MODE  remplace la syntaxe -perm +MODE, qui est dépréciée depuis
+       findutils-4.2.21. -perm /000 correspond maintenant à tous les  fichiers
+       plutôt qu’à aucun, comme dans findutils-4.3.3.
+
+       La  gestion des nanosecondes dans les timestamps a été implémentée dans
+       findutils-4.3.3.
+
+       L’action -delete force find à envoyer un statut de sortie  non  nul  en
+       cas   d’échec,   comme   dans   findutils-4.3.11.  Toutefois,  find  ne
+       s’interrompra pas immédiatement.  Dans  les  versions  précédentes,  le
+       statut de sortie de find n’était pas modifié par l’échec de -delete.
+
+       Fonctionnalités        Ajoutées   Offertes dans
+       -newerXY               4.3.3      BSD
+       -D                     4.3.1
+       -O                     4.3.1
+       -readable              4.3.0
+       -writable              4.3.0
+       -executable            4.3.0
+       -regextype             4.2.24
+       -exec ... +            4.2.12     POSIX
+       -execdir               4.2.12     BSD
+       -okdir                 4.2.12
+       -samefile              4.2.11
+       -H                     4.2.5      POSIX
+       -L                     4.2.5      POSIX
+       -P                     4.2.5      BSD
+       -delete                4.2.3
+       -quit                  4.2.3
+       -d                     4.2.3      BSD
+       -wholename             4.2.0
+       -iwholename            4.2.0
+       -ignore_readdir_race   4.2.0
+       -fls                   4.0
+       -ilname                3.8
+       -iname                 3.8
+       -ipath                 3.8
+       -iregex                3.8
+
+FAUX BOGUES
+
+       $ find . -name *.c -print
+       find : les chemins doivent précéder l’expression
+       Syntaxe : find [-H] [-L] [-P] [-Oniveau] [-D help|tree|search|stat|rates|opt|exec] [CHEMIN...] [EXPRESSION]
+
+       Cette  erreur  survient parce que *.c a été interprété par le shell, et
+       que la commande  find  a  en  fait  reçu  une  ligne  de  commande  qui
+       ressemblait à:
+
+       find . -name bigram.c code.c frcode.c locate.c -print
+
+       Cette commande ne peut bien sûr en aucun cas fonctionner. Plutôt que de
+       vous y prendre de cette façon, vous pourriez protéger  votre  motif  de
+       recherche par des guillemets ou protéger les caractères jokers :
+       $ find . -name \*.c -print
+
+BOGUES
+
+       Des  problèmes  de sécurité se posent, inhérent au comportement de find
+       tel que définit par le standard POSIX, et  qui  ne  peuvent  donc  être
+       résolus.  Par  exemple,  l’action  -exec  est dangereuse par nature, et
+       l’usage de -execdir est préférable. Consultez plutôt Finding Files pour
+       plus de détails.
+
+       La  variable  d’environnement  LC_COLLATE  n’a aucun effet sur l’action
+       -ok.
+
+       La meilleure façon de signaler un bogue est d’utiliser le formulaire en
+       ligne  sur  http://savannah.gnu.org/bugs/?group=findutils. L’intérêt de
+       cette méthode est que vous pourrez ensuite  suivre  l’évolution  de  la
+       résolution du problème. Tout autre commentaire concernant find(1) et le
+       paquet findutils en général peut être envoyé à la  liste  de  diffusion
+       bug-findutils.  Pour  vous abonner à cette liste, envoyez un courriel à
+       bug-findutils-request@gnu.org.
+
+TRADUCTION
+
+       Cette page de manuel a été traduite  et  mise  à  jour  par  Christophe
+       Blaess  entre  1997  et  2003.   La  version  présente  dans Debian est
+       dorénavant maintenue par Sylvain Cherrier <sylvain DOT cherrier AT free
+       DOT  fr>  et  les  membres de la liste <debian-l10n-french AT lists DOT
+       debian DOT org>.  Veuillez signaler toute erreur de traduction  par  un
+       rapport de bogue sur le paquet manpages-fr-extra.
+
+                                                                       
+

@@ -1,0 +1,1117 @@
+man top
+
+NOM
+
+       top - Afficher les tâches
+
+SYNOPSIS
+
+       top -hv | -bcHisS -d delay -n iterations -p pid [, pid ...]
+
+       Le commutateur traditionnel « - » et les espaces sont optionnels.
+
+       Le  programme  top  fournit  une vue dynamique temps réel du système en
+       cours d’exécution. Il peut  afficher  un  résumé  des  informations  du
+       système aussi bien qu’une liste de tâches gérées sur le moment par le
+       noyau. L’affichage des différents types de  résumés  d’informations  du
+       système  ainsi que la présentation des types, de l’ordonnancement et de
+       la taille des informations sur les tâches sont toutes réglables et  ces
+       paramètres peuvent être conservés pour les démarrages ultérieurs.
+
+       Le  programme  fournit une interface interactive aux fonctions limitées
+       pour la manipulation de processus ainsi  qu’une  interface  plus  riche
+       pour  personnaliser  sa  propre configuration  --  l’interface couvrant
+       toutes les facettes de ces opérations. Alors que vous  vous  référez  à
+       top  tout  au  long de ce document, vous avez la liberté de le renommer
+       comme vous l’entendez. Ce nouveau  nom,  probablement  un  alias,  sera
+       répercuté  dans  l’affichage de top et utilisé lors de la lecture et de
+       l’écriture du fichier de configuration.
+
+VUE D’ENSEMBLE
+   Documentation
+       Table des matières
+          1. Options de la LIGNE de COMMANDE
+          2. CHAMPS / Colonnes
+              a. DESCRIPTIONS des champs
+              b. SÉLECTION et ORDONNANCEMENT des colonnes
+          3. Commandes INTERACTIVES
+              a. Commandes GLOBALES
+              b. Commandes de la zone RÉSUMÉ
+              c. Commandes de la zone de TÂCHES
+              d. Choix des COULEURS
+          4. Mode AFFICHAGE ALTERNATIF
+              a. Vue d’ensemble du FENÊTRAGE
+              b. COMMANDES de Fenêtrage
+          5. FICHIERS
+              a. Fichier de configuration SYSTÈME
+              b. Fichier de configuration PERSONNEL
+          6. Échantillons d’ASTUCES IDIOTES
+              a. Magie du noyau
+              b. Fenêtres Rebondissantes
+              c. La Fenêtre du Grand Oiseau
+           7. BOGUES,
+           8. HISTORIQUE des Versions Précédentes,
+           9. AUTEURS,
+          10. VOIR AUSSI
+
+   Manipulation
+       Lors de la manipulation de top, les deux touches les  plus  importantes
+       sont  celles  qui  permettent d’accéder à l’aide (« h » ou « ? ») et de
+       quitter le programme (« q »). Vous pouvez tout aussi bien  utiliser  la
+       combinaison d’interruption classique (« ^C »).
+
+       Au premier démarrage, top présente les éléments d’écran habituels :
+         1) Zone de Résumé ;
+         2) Ligne d’invite de Message ;
+         3) Entête de colonnes ;
+         4) Zone de Tâches.
+        Il y a cependant quelques différences avec les versions précédentes de
+       top.
+
+       Surbrillance
+          Zone_Résumé : il n’y a pas  de  surbrillance de  la  charge/durée de
+          fonctionnement  et  seules  sont  mises  en évidence les valeurs des 
+          autres éléments.
+
+          Zone_des_Tâches : Les tâches actives (ou prêtes à s’exécuter) seront 
+          mises en évidences. La mise en gras est une manière d’y arriver.
+
+       Contenu/Étiquettes
+          Zone_Résumé :  Le  nom  du  programme,  ou   éventuellement  un lien 
+          symbolique ou un alias, est affiché. L’étiquette d’état du (des) CPU
+          suggère  d’autres  possibilités.  Les statistiques  sur  la  mémoire
+          utilisent un « k » minuscule.
+
+          Entête_de_Colonnes :  affiche  un nouveau champ et des modifications
+          de certaines étiquettes. Vous aurez un choix plus large de champs au 
+          moment de personnaliser top.
+
+       Note : la largeur d’affichage de top  est  limitée  à  512  caractères.
+       L’affichage  de tous les champs nécessite un minimum de 160 caractères.
+       La largeur restante peut être utilisée pour la colonne «COMMAND ».
+
+   Valeurs par défaut au démarrage
+       Les valeurs de démarrage par défaut ci-dessous ne  sont  pas  prise  en
+       charge  par  le  fichier  de  configuration  et  par  conséquent aucune
+       personnalisation n’est possible. Néanmoins, certains  éléments  marqués
+       avec  un  astérisque  (« * »)  peuvent  être  modifiés  par la ligne de
+       commande.
+
+           Valeurs_Globales_par_défaut
+              « A » - Affichage alterné         Inactif (plein écran)
+            * « d » - Délai                     3.0 secondes
+              « I » - Mode Irix                 Actif  (non, « Solaris » SMP)
+            * « p » - Suivi de PID              Inactif
+            * « s » - Mode sécurisé             Inactif (non sécurisé)
+              « B » - En gras                   Inactif
+           Valeurs_Zone_Résumé_par_défaut
+              « l » - Charge Moy/Uptime         Actif  (donc nom du programme)
+              « t » - États des tâches/CPU      Actif  (1+1 lignes, cf. « 1 »)
+              « m » - Utilisation Mém/Swap      Actif  (2 lignes)
+              « 1 » - Processeur unique         Actif  (donc 1 ligne si SMP)
+           Valeurs_Zone_Tâche_par_défaut
+              « b » - En gras                   Actif  (pas « inverse »)
+            * « c » - Ligne de commande         Inactif (nom, pas cmdligne)
+            * « H » - Threads                   Inactif (montre tous les fils)
+            * « i » - Tâches en veille          Actif  (montre toutes tâches)
+              « R » - Ordre inverse             Actif  (PID décroissants)
+            * « S » - Temps cumulatif           Inactif (non, fils morts)
+              « x » - Surbrillance de colonne   Inactif (non, trie les champs)
+              « y » - Surbrillance de ligne     Actif  (oui, tâches actives)
+              « z » - couleur/monochrome        Inactif (non, couleurs)
+
+1. Options de la LIGNE de COMMANDE
+
+       Voici la syntaxe de la ligne de commande de top :
+
+            -hv | -bcHisS -d délai -n itérations -p pid [,pid...]
+
+       Le  caractère  utilisé   comme   commutateur   (« - »)   habituellement
+       obligatoire et même les espaces sont totalement optionnels.
+
+       -b : Traitement par lot  (« batch mode »)
+            Lance  top en mode « Traitement par lot », utile pour envoyer, par
+            exemple, le résultat de top vers une autre application ou dans  un
+            fichier.  Dans ce mode, top n’accepte aucune entrée et s’exécutera
+            jusqu’à atteindre la limite d’itérations que vous avez  déterminée
+            par « -n » ou jusqu’à ce qu’il soit tué.
+
+       -c : Option Ligne de Commande/Nom du programme
+            Lance  top  en inversant le dernier état « c » connu. Donc, si top
+            affichait des lignes de commandes, maintenant, ce  champ  montrera
+            le  nom  des applications et vice versa. Voir commande interactive
+            « c » pour plus d’informations.
+
+       -d : Durée de l’intervalle :  -d ss.dd (secondes.dixièmes)
+            Fixe le délai de  rafraîchissement  de  l’écran,  substituant  les
+            valeurs  du  fichier  de  configuration personnel ou la valeur par
+            défaut au démarrage. Par la suite, cette valeur peut être modifiée
+            avec la commande interactive « d » ou « s ».
+
+            Les  fractions de seconde sont prises en compte, contrairement aux
+            valeurs  négatives.  Quoiqu’il  en  soit,  cependant,  de   telles
+            modifications  sont  prohibées  quand  top  fonctionne  en  « Mode
+            Sécurisé », à part pour root (à moins que l’option de la ligne  de
+            commande  « s » ne soit utilisée). Pour plus d’informations sur le
+            « Mode Sécurisé », voir le  sujet  5a.  Fichier  de  Configuration
+            SYSTÈME.
+
+       -h : Aide
+            Affiche la version de la bibliothèque et l’usage, puis quitte.
+
+       -H : Option processus légers
+            Lance  top  en  inversant le dernier état connu de l’option « H ».
+            Lorsque  l’option  est  Actif,  tous  les  processus  légers  sont
+            affichés.  Autrement,  top affiche un résumé de tous les processus
+            légers d’un processus.
+
+       -i : Option processus en veille
+            Lance top en inversant l’état de la dernière option « i »  connue.
+            En  Inactif,  les  tâches  en  veille  ou  à l’état de zombie sont
+            masquées.
+
+       -n : Nombre d’itérations limité comme :  -n nombre
+            Plafonne le nombre d’itérations, ou de rafraîchissements  que  top
+            doit réaliser avant de se terminer.
+
+       -u : Suivi par utilisateur comme :  -u utilisateur
+            Surveille  les  seuls  processus  d’un utilisateur correspondant à
+            l’UID ou au nom utilisateur donné.
+
+       -U : Suivi utilisateur comme : -U utilisateur
+            Surveille les seuls processus avec l’UID  ou  le  nom  utilisateur
+            correspondant  à celui donné, aussi bien les UID réels, effectifs,
+            sauvegardés que les UID systèmes de fichiers.
+
+       -p : Suivi des PID comme : -pN1 -pN2 ... ou bien -pN1, N2 [,...]
+            Surveille les seuls  processus  déterminés  par  leurs  ID.  Cette
+            option  peut  être  réitérée  jusqu’à  20 fois. Vous avez aussi la
+            possibilité de fournir une liste de maximum 20 PID séparés par des
+            virgules. Une approche mixte est aussi autorisée.
+
+            Ça  ne  concerne  que  l’option de la ligne de commande. Au cas où
+            vous souhaiteriez revenir à un fonctionnement classique, il  n’est
+            pas  nécessaire  de  quitter  et  de  relancer  top  --  saisissez
+            simplement « = » interactivement.
+
+       -s : Opération en mode sécurisé
+            Lance top en forçant le mode sécurisé, même pour root. Ce mode est
+            plus  finement  contrôlé  par le fichier de configuration (voir le
+            sujet 5. FICHIERS).
+
+       -S : Bascule en mode cumul de temps
+            Lance top en inversant la valeur de l’état du dernier « S » connu.
+            Lorsque  le  mode  cumul  du temps est Actif, chaque processus est
+            listé avec le temps cpu consommé par lui-même et ses  fils  morts.
+            Voir  commande  interactive  «S »  pour plus d’informations sur ce
+            mode.
+
+       -v : Version
+            Affiche la version de la bibliothèque et l’usage, puis quitte.
+
+2. CHAMPS / Colonnes
+
+   2a. DESCRIPTIONS des Champs
+       Ci-dessous, la liste des champs de top disponibles. Ils  sont  toujours
+       associés  à la lettre présentée, indépendamment de la position que vous
+       leur avez attribué avec la commande interactive  « o »  (Ordonnancement
+       de champs).
+
+       Tout  champ peut être choisi comme clé de tri croissant ou décroissant,
+       comme bon vous semble. Pour plus d’informations sur  les  clés  de  tri
+       voir le sujet 3c. Commandes de la zone de TÂCHES.
+
+       a : PID  --  Id de Processus
+          L’ID  unique  du  processus de la tâche. Il s’adapte périodiquement,
+          sans toutefois redémarrer à zéro.
+
+       b : PPID  --   PID du processus parent
+          Le processus ID du parent de la tâche.
+
+       c : RUSER  --  Nom de l’utilisateur réel
+          Le véritable nom utilisateur du propriétaire de la tâche.
+
+       d : UID  --  Identifiant de l’utilisateur
+          L’ID utilisateur effectif du propriétaire de la tâche.
+
+       e : USER  --  Nom de l’utilisateur
+          Le nom utilisateur effectif du propriétaire de la tâche.
+
+       f : GROUP  --  Nom du groupe
+          Le nom du groupe réel du propriétaire de la tâche.
+
+       g : TTY  --  Tty de contrôle
+          Le nom  du  terminal  de  contrôle.  Habituellement,  il  s’agit  du
+          périphérique  (port série, pty, etc.) à partir duquel le processus a
+          été lancé, et qu’il utilise pour ses entrées ou ses sorties. Au  cas
+          où aucun terminal n’est associé à une tâche, un « ? » est affiché.
+
+       h : PR  --  Priorité
+          La priorité de la tâche.
+
+       i : NI  --  Valeur de politesse
+          La valeur de politesse de la tâche. Une valeur négative signifie une
+          priorité plus haute, à l’inverse  d’une  valeur  positive.  Un  zéro
+          signifie  simplement  que  le  lancement  d’une tâche ne tiendra pas
+          compte de la priorité.
+
+       j : P  --  Dernier CPU utilisé (SMP)
+          Un nombre  représentant  le  dernier  processeur  utilisé.  Dans  un
+          véritable environnement SMP, cette valeur change fréquemment puisque
+          le noyau utilise  intentionnellement  une  affinité  faible.  Ainsi,
+          l’activité  propre de top peut casser cette faible affinité et faire
+          en sorte qu’un nombre plus élevé de processus change plus souvent de
+          CPU (à cause d’une demande supplémentaire de temps CPU).
+
+       k : %CPU  --  Utilisation CPU
+          Le  partage  par  les  tâches  du temps CPU écoulé depuis le dernier
+          rafraîchissement d’écran, exprimé en pourcentage du temps CPU total.
+          Dans  un  véritable  environnement  SMP,  si  le  « mode  Irix » est
+          Inactif, top fonctionnera en « mode Solaris » où l’usage  cpu  d’une
+          tâche sera répartie sur le nombre total de CPU. Vous pouvez basculer
+          de modes «Irix/Solaris » avec la commande interactive « I ».
+
+       l : TIME  --  Temps CPU
+          Le temps CPU total utilisé par la tâche depuis son lancement.  Quand
+          le  «mode  Cumulatif » est Actif, chaque processus est listé avec le
+          temps cpu que lui et ses fils tués ont utilisé. Vous pouvez basculer
+          en  « mode Cumulatif » avec « S », qui est une option de la ligne de
+          commande et une commande interactive. Voir  la commande  interactive
+          « S » pour plus d’informations sur ce mode.
+
+       m : TIME+  --  Temps CPU, en centièmes
+          Identique  à  « TIME », mais avec une précision supérieure grâce aux
+          centièmes de seconde.
+
+       n : %MEM  --  Utilisation mémoire (RES)
+          Pourcentage de la mémoire physique disponible actuellement  utilisée
+          par la tâche.
+
+       o : VIRT  --  Image virtuelle (Ko)
+          La  quantité  totale  de  mémoire virtuelle utilisée par la tâche, à
+          savoir l’ensemble des codes,  données,  bibliothèques  partagées  et
+          pages qui ont été transférées sur l’espace d’échange (« swap »).
+
+          VIRT = SWAP + RES.
+
+       p : SWAP  --  Taille en espace d’échange (Ko)
+          La  portion  en  espace  d’échange de la totalité de l’image mémoire
+          virtuelle d’une tâche.
+
+       q : RES  --  Taille résidente (Ko)
+          La mémoire physique « non swappée » qu’une tâche a utilisée.
+
+       r : CODE  --  Taille du code (Ko)
+          La quantité de mémoire virtuelle  allouée  à  un  exécutable,  aussi
+          connue comme la taille du « text resident set » ou TRS
+
+       s : DATA  --  Taille des données + pile (Ko)
+          La  quantité  de  mémoire  virtuelle  allouée  à autre chose que des
+          exécutables, aussi connue sous le nom de « data  resident  set »  ou
+          DRS.
+
+       t : SHR  --  Taille mémoire partagée (Ko)
+          La quantité de mémoire partagée utilisée par une tâche. Elle reflète
+          simplement la quantité de  mémoire  qui  peut  être  potentiellement
+          partagée avec d’autres processus.
+
+       u : nFLT  --  nombre de défauts de page
+          Le  nombre  de  défauts  de  pages majeurs générés par une tâche. Un
+          défaut de page est levé quand un processus tente de lire ou d’écrire
+          dans  une  page  virtuelle placée hors de son espace d’adressage. Un
+          défaut de page est majeur quand un accès  à  une  mémoire  de  masse
+          (comme  un  disque)  est  impliqué  lors de la récupération de cette
+          page.
+
+       v : nDRT  --  nombre de pages modifiées (« Dirty Pages »)
+          Le nombre de pages modifiées depuis la dernière écriture sur disque.
+          Les  pages  modifiées  doivent  être  écrites  sur  disque avant que
+          l’espace mémoire physique correspondant puisse être utilisé pour une
+          autre page virtuelle.
+
+       w : S  --  État du processus
+          L’état de la tâche peut être :
+            « D » = dormant non interruptible
+            « R » = s’exécutant
+            « S » = dormant
+            « T » = tracé ou stoppé
+            « Z » = zombie
+
+          Les  tâches  dites  « s’exécutant »  doivent plutôt être considérées
+          comme «prêtes à s’exécuter »  --  leur  task_struct  est  simplement
+          représentée  sur  la  file  d’attente  d’exécution du noyau. Même en
+          l’absence  d’une  véritable  machine  SMP,  vous  pouvez   voir   de
+          nombreuses tâches dans cet état en fonction de la valeur du délai et
+          de la valeur de politesse de top.
+
+       x : COMMAND  --   Ligne de commande ou nom du programme
+          Affiche la ligne de commande utilisée pour lancer une  tâche  ou  le
+          nom  du  programme associé. Vous basculez entre la ligne de commande
+          et le nom avec la touche « c », qui est à la fois une option  de  la
+          ligne de commande et une commande interactive.
+
+          Lorsque  vous  décidez  d’afficher  des  lignes  de  commandes,  les
+          processus sans ligne de  commande  (tels  les  processus  légers  du
+          noyau)  seront  présentés  avec  leur  seul  nom  de programme entre
+          parenthèses, comme dans cet exemple :
+                ( mdrecoveryd )
+
+          Tout affichage est susceptible  d’être  tronqué  si  la  largeur  du
+          contenu  dépasse  celle  du  champ.  Cette largeur dépend des autres
+          champs sélectionnés, de leur ordre  et  de  la  taille  actuelle  de
+          l’écran.
+
+          Note : Le comportement du champ/colonne « COMMAND » est unique, dans
+          la mesure où sa largeur n’est pas fixe. La totalité  de  la  largeur
+          résiduelle  de  l’écran  sera,  lors de l’affichage, allouée à cette
+          colonne (jusqu’à un maximum de 512 caractères) pour  répondre  à  la
+          croissance   potentielle  des  noms  de  programmes  des  lignes  de
+          commandes.
+
+       y : WCHAN  --  Fonction Résidente
+          Selon  la  disponibilité  de   la   carte   des   liens   du   noyau
+          (« System.map »),  ce  champ  affichera  le  nom  ou l’adresse de la
+          fonction  du  noyau  dans  laquelle  la  tâche   est   effectivement
+          résidente. Un tiret (« - ») s’affichera dans cette colonne en regard
+          des tâches actives.
+
+          Note : L’affichage de ce champ provoquera une surestimation de  plus
+          de  700Ko  due au propre fonctionnement de top. La seule manière que
+          vous ayez pour réduire cette surestimation est de redémarrer top.
+
+       z : Flags  --  Indicateurs de tâche
+          Cette colonne représente  les  indicateurs  de  tâches  actuellement
+          ordonnancées. Ces indicateurs sont exprimés en notation hexadécimale
+          sans  les   zéros.   Ils   sont   officiellement   documentés   dans
+          <linux/sched.h>. Une documentation moins formelle est accessible sur
+          les écrans « Choix de champs » et « Ordonnancement de champs ».
+
+   2b. SÉLECTION et ORDONNANCEMENT des colonnes
+       Après avoir pressé une  des  touches  de  commande  interactives  « f »
+       (choix  de  champs)  ou  «o »  (ordonnancement  de  champs),  un  écran
+       présentant les chaînes de champs actuels  s’affichera  suivi  de  leurs
+       noms et descriptions respectifs.
+
+       Voici  un  exemple  d’une  chaîne  de  champs  d’un  des  4  groupes de
+       fenêtres/champs de top et une explication des conventions utilisées :
+
+       -  Exemple de chaîne de champs :
+            ANOPQRSTUVXbcdefgjlmyzWHIK
+
+       -  L’ordonnancement des champs affichés correspond  à  l’ordonnancement
+          des lettres dans cette chaîne.
+
+       -  Si  la lettre est une majuscule le champ correspondant fera lui-même
+          partie intégrante de l’écran de tâches (si la largeur de l’écran  le
+          permet).  Cet état sera aussi marqué par un astérisque (« * ») placé
+          en tête de ligne, comme dans cet extrait :
+            ...
+            * K: %CPU     = Utilisation CPU
+              l: TIME     = Temps CPU
+              m: TIME+    = Temps CPU, centièmes
+            * N! %MEM     = Utilisation Mémoire (RES)
+            * O: VIRT     = Image virtuelle (Ko)
+            ...
+
+       Écran pour le choix de champs  --  la commande interactive « f »
+          Vous  basculez dans l’affichage d’un champ en pressant simplement la
+          lettre correspondante.
+
+       Écran d’ordonnancement des champs  --  la commande interactive « o »
+          Vous  déplacez  un  champ  vers  la  gauche  en  pressant  la lettre
+          majuscule correspondante et vers la droite avec la lettre minuscule.
+
+   2c. États du CPU
+       Les  états  du CPU sont affichés dans la Zone Résumé. Ils sont toujours
+       présentés sous forme de pourcentage du temps écoulé depuis  le  dernier
+       rafraîchissement.
+
+        us  --  Temps CPU Utilisateur
+          Temps  consacré  par  le  CPU  aux  processus  utilisateurs  dont la
+          politesse n’a pas été modifiée.
+
+        sy  --  Temps CPU Système
+          Temps consacré par le CPU au noyau et à ses processus.
+
+        ni  --  Temps Politesse (« Nice ») du CPU
+          Temps consacré  par  le  CPU  aux  processus  utilisateurs  dont  la
+          politesse a changé.
+
+        wa  --  en attente E/S (« iowait »)
+          Temps consacré par le CPU à attendre la fin des E/S.
+
+        hi  --  IRQ Matériel
+          Temps  consacré  par  le  CPU  aux  sollicitations des interruptions
+          matérielles.
+
+        si  --  Interruptions logicielles
+          Temps consacré par  le  CPU  aux  sollicitations  des  interruptions
+          logicielles.
+
+        st  --  Temps volé
+          La  quantité  de  temps  CPU  « volé »  à  la  machine virtuelle par
+          l’hyperviseur pour d’autres tâches  (telles  que  la  gestion  d’une
+          autre machine virtuelle).
+
+3. Commandes INTERACTIVES
+
+       Ci-dessous,  un  index succinct de commandes regroupées par catégories.
+       Certaines  commandes   apparaissent   plus   d’une   fois    --    leur
+       signification  ou  leur  portée peut différer selon le contexte de leur
+       utilisation.
+
+         3a. Commandes_GLOBALES
+               <Ret/Sp> ?, =, A, B, d, G, h, I, k, q, r, s, W, Z
+         3b. Commandes_Zone_RESUME
+               l, m, t, 1
+         3c. Commandes_Zone_de_TACHES
+               Apparence:  b, x, y, z
+               Contenu:    c, f, H, o, S, u
+               Taille:     #, i, n
+               Tri:        <, >, F, O, R
+         3d. Palette_des_COULEURS
+               <Ret>, a, B, b, H, M, q, S, T, w, z, 0 - 7
+         4b. COMMANDES_de_Fenêtrage
+               -, _, =, +, A, a, G, g, w
+
+   3a. Commandes GLOBALES
+       Les commandes interactives globales sont toujours  disponibles  que  ce
+       soit  en  mode  plein écran ou en mode affichage alternatif. Toutefois,
+       certaines de ces commandes interactives  ne  sont  pas  disponibles  en
+       « mode Sécurisé ».
+
+       Si vous souhaitez savoir à l’avance si top fonctionne en mode sécurisé,
+       appelez simplement l’aide et consultez  la  deuxième  ligne  du  résumé
+       système.
+
+         <Entrée> or <Espace> : Rafraîchissement_de_l'Affichage
+              Ces  commandes  ne  font  rien,  elles sont simplement ignorées.
+              Néanmoins, elles activeront top et  toute  réception  ultérieure
+              rafraîchira l’entièreté de l’écran.
+
+              Utilisez  l’une  ou  l’autre  de  ces touches quand le délai est
+              élevé et que vous souhaitiez consulter l’état courant.
+
+         <?> or <h> : Aide
+              Deux niveaux d’aide sont disponibles. Le premier offre un rappel
+              de  toutes  les  commandes  interactives  de base. Quand top est
+              sécurisé, cet écran est plus succinct.
+
+              En appuyant sur « h » ou  « ? »  dans  l’écran  d’aide,  l’écran
+              affichera  l’aide  de  cette  commande interactive applicable au
+              mode affichage alternatif.
+
+         <=> : Annule_Limites_des_Tâches
+              Enlève les restrictions sur les tâches qui sont affichées. Cette
+              commande  inverse  chaque  commande  « i » (tâches en veille) et
+              « n » (nombre de tâches maximum) qui peuvent être actives.  Elle
+              fournit aussi un moyen d’arrêter la surveillance d’un PID. Voyez
+              l’option  de  la  ligne  de   commande   « -p »   décrivant   la
+              surveillance de PID.
+
+              En  opérant  en  mode  affichage  alternatif, la portée de cette
+              commande est légèrement plus étendue.
+
+         <A> : Bascule_en_Mode_Affichage_Alternatif
+              Cette commande bascule entre le mode  plein  écran  et  le  mode
+              affichage alternatif. Voir le sujet 4. Mode AFFICHAGE ALTERNATIF
+              et  la   commande   interactive   « G »   pour   une   meilleure
+              compréhension  de  la   fenêtre  « active »  et  des  groupes de
+              champs.
+
+         <B> : Bascule Gras_Désactivé/Activé
+              Cette commande influencera l’utilisation des capacités  de  mise
+              en  « gras »  du terminal et modifie à la fois la zone résumé et
+              la zone de tâches de la  fenêtre « active ». Alors qu’elle était
+              initialement  conçue pour une utilisation avec des terminaux non
+              intelligent (« dumb terminals »), elle peut  être  appliquée  en
+              toute occasion.
+
+              Note :  Lorsque  cette option est Actif et que top fonctionne en
+              mode monochrome, l’entièreté de l’affichage apparaîtra comme  du
+              texte normal. Donc, à moins que les options « x » et/ou « y » ne
+              soient inversées pour accentuer la mise en évidence, il n’y aura
+              pas de confirmation visuelle de leur activité.
+
+       * <d> ou <s> : Modification_du_Délai
+              Vous invite à introduire le délai, en secondes, des mises à jour
+              de l’affichage.
+
+              Les fractions de secondes sont possibles, mais pas  les  nombres
+              négatifs.  La  valeur  0  entraînera  une  mise  à  jour (quasi)
+              permanente,  responsable  d’un  affichage  décevant  puisque  le
+              système  et  le  périphérique tty essayeront de tenir compte des
+              demandes  de  top.  La   valeur   du   délai   est   inversement
+              proportionnelle  à  la  charge  du système, alors positionnez-la
+              avec soin.
+
+              A tout moment, vous pouvez porter à votre connaissance le  délai
+              effectif  en  appelant l’aide et en consultant la deuxième ligne
+              du résumé système.
+
+         <G> : Choisir_un_Autre_Groupe_Fenêtre/Champ
+              Vous invite à introduire un numéro entre 1 et 4 pour désigner le
+              groupe  de  fenêtres/champs  de  la   fenêtre  « active ».  Vous
+              trouverez  assez  vite  vos  marques  avec   ces   4   fenêtres,
+              spécialement en expérimentant le mode affichage alternatif.
+
+         <I> : Bascule_en_Mode_Irix/Solaris
+              En  fonctionnant  en  « mode  Solaris »  (bascule  de  « I »  en
+              Inactif), la consommation cpu d’une tâche sera répartie  sur  le
+              nombre  total  de  CPU. Après avoir exécuté cette commande, vous
+              serez informés du nouvel état de cette option.
+
+         <u> : Choisir un utilisateur
+              Vous invite à introduire un UID ou un nom  d’utilisateur.  Seuls
+              les processus appartenant à cet utilisateur seront affichés.
+
+         <U> : Choisir un utilisateur
+              Vous  invite  à introduire un UID ou un nom d’utilisateur. Seuls
+              les processus appartenant à  cet  utilisateur  seront  affichés.
+              Cette option s’applique aux UID réels, effectifs, sauvegardés et
+              système de fichiers.
+
+       * <k> : Tuer_une_tâche
+              Vous invite à introduire le PID et ensuite le signal à  envoyer.
+              Le  signal  par  défaut, comme le propose l’invite, est SIGTERM.
+              Cependant, vous pouvez indiquer le nom  ou  le  numéro  de  tout
+              autre signal.
+
+              Si  vous souhaitez annuler la terminaison d’un processus, faites
+              une des choses suivantes selon le niveau de progression :
+                1) à l’invite du PID, appuyez juste sur <Entrée>
+                2) à l’invite du signal, tapez 0
+
+         <q> : Quitter
+
+       * <r> : Politesse_d'une_Tâche
+              Vous invite  à  introduire  le  PID  et  ensuite  la  valeur  de
+              politesse  à  appliquer.  Une  valeur  positive  provoquera  une
+              diminution de la priorité de la tâche. A l’inverse,  une  valeur
+              négative la fera considérer plus favorablement par le noyau.
+
+         <W> : écrit_le_Fichier_de_Configuration
+              Cette commande sauvegardera toutes vos options et bascules ainsi
+              que le mode d’affichage courant et le délai. En exécutant  cette
+              commande  juste avant de quitter top, vous pourrez redémarrer en
+              conservant exactement la même configuration.
+
+         <Z> : Changement_Palette_Couleurs
+              Cette  commande  affichera  un  écran  séparé  où  vous  pourrez
+              modifier  les  couleurs  de la  fenêtre « active », ou de toutes
+              les fenêtres. Pour plus de  détails  concernant  cette  commande
+              interactive, voir le sujet 3d. Palette des COULEURS.
+
+       *  Les   commandes  préfixées  d’un  astérisque  (« * »)  ne  sont  pas
+          disponible en « mode  Sécurisé »,  elles  ne  seront  pas  non  plus
+          présentées au premier niveau de l’écran d’aide.
+
+   3b. Commandes de la zone RÉSUMÉ
+       Les  commandes interactives de la zone résumé sont toujours accessibles
+       à la fois en mode plein écran et en mode  affichage  alternatif.  Elles
+       affectent  les  premières  lignes  de  votre  écran et détermineront la
+       position des messages et des invites.
+
+       Ces commandes ont toujours un impact sur la  fenêtre  « active »/groupe
+       de  champs.  Voir  le sujet 4. Mode AFFICHAGE ALTERNATIF et la commande
+       interactive « G » pour une description  plus  précise  de  la   fenêtre
+       « active » et des groupes de champs.
+
+         <l> :Bascule_Charge_Moyenne/Temps_d'activité  --  Actif/Inactif
+              Il  s’agit  aussi  de  la  ligne  contenant  le nom du programme
+              (éventuellement un alias) en mode plein écran ou du  nom  de  la
+               fenêtre « active » en mode affichage alternatif.
+
+         <m> : Bascule_Utilisation_Mémoire/Swap  --  Actif/Inactif
+              Cette commande affecte deux lignes de la zone résumé.
+
+         <t> : Bascule_Etats_Tâche/CPU  --  Actif/Inactif
+              Cette  commande affecte 2 ou plusieurs lignes de la zone résumé,
+              en fonction de l’état de l’option « 1 » et si top s’exécute  sur
+              un vrai SMP ou non.
+
+         <1> : Bascule_états_CPU_Simple/Séparé  --  Actif/Inactif
+              Cette commande affecte la manière dont est présentée la zone des
+              États des CPU de la commande « t ». Alors que cette option a été
+              conçue  initialement  avant  tout  dans le cadre de machines SMP
+              massivement-parallèles, son utilisation n’est pas restreinte aux
+              seuls environnements SMP.
+
+              Quand  l’étiquette « Cpu(s): » est affichée dans la zone résumé,
+              l’option « 1 » est Actif  et  toute  l’information  du  cpu  est
+              rassemblée  sur  une  seule  ligne.  Autrement,  chaque  cpu est
+              affiché séparément de cette manière : «Cpu0, Cpu1, ... »
+
+       Note : Si la totalité  de  la  zone  résumé  est  Inactif  pour  chaque
+       fenêtre,  vous  n’aurez  juste accès qu’à la ligne de message. De cette
+       manière vous maximiserez le  nombre  de  lignes  disponibles  pour  les
+       tâches  au  dépend  (temporairement)  du nom du programme en mode plein
+       écran ou du nom de la  fenêtre « active » en mode affichage alternatif.
+
+   3c. Commandes de la zone de TÂCHES
+       Les  commandes  interactives  de  la  zone  de  tâches  sont   toujours
+       disponibles en mode plein écran.
+
+       Les commandes interactives  de  la  zone  de  tâches  ne  sont   jamais
+       disponibles  en  mode affichage alternatif quand l’option de l’écran de
+       tâches de la  fenêtre « active » est positionné sur  Inactif  (voir  le
+       sujet 4. Mode AFFICHAGE ALTERNATIF).
+
+       PRÉSENTATION de la fenêtre de tâches
+         Les  commandes  suivantes  seront  aussi  influencées  par  l’état de
+         l’option globale « B » (gras désactivé).
+
+         <b> : Bascule_Gras/Inverse
+              Cette commande affectera la manière dont les  options  « x »  et
+              « y »  seront  affichées.  En outre, elle ne sera disponible que
+              lorsqu’au moins une de ces options sera Actif.
+
+         <x> : Bascule_Surbrillance_de_Colonne
+              Modifie la surbrillance  du  champ  actuellement  trié.  Il  est
+              probable  que  vous n’ayez pas constamment besoin d’un rappel de
+              la clé de tri, aussi, top espère que vous  l’exécutiez  avec  la
+              « surbrillance  de colonne » toujours positionnée sur Inactif, à
+              cause du surcoût lié à la longueur des chemins.
+
+              Si vous ne vous rappelez plus de la clé de tri,  cette  commande
+              peut servir de rappel visuel rapide.
+
+         <y> : Bascule_Surbrillance_Ligne
+              Modifie  la surbrillance de tâches « qui s’exécutent ». Pour une
+              meilleure compréhension de l’état de cette tâche, voir le  sujet
+              2a. DESCRIPTIONS de champs, État de processus.
+
+              L’utilisation   de   cette  disposition  fournit  une  meilleure
+              compréhension de l’état de santé de  votre  système.  Les  seuls
+              surcoûts   consisteront   en  quelques  séquences  d’échappement
+              supplémentaires sur le tty.
+
+         <z> : Bascule_Couleur/Monochrome
+              Alterne sur la  fenêtre « active » le dernier schéma de  couleur
+              utilisé  et  l’ancienne  formule blanc-et-noir ou noir-et-blanc.
+              Cette commande touche à la fois la zone résumé  et  la  zone  de
+              tâches  mais  n’affectera  pas l’état des options « x », « y» ou
+              « b ».
+
+       CONTENU de la fenêtre de tâches.
+         <c> : Bascule_Nom_Commande_Ligne/Programme
+              Cette commande sera appliquée, que la colonne  « COMMAND »  soit
+              actuellement  visible  ou  non.  Par  la  suite, si le champ est
+              affiché, la modification deviendra visible.
+
+         <f> et <o> : Champs_sélectionnés ou Ordonnancement_de_Champs
+              Ces  touches  présentent  des  écrans  séparés  où  vous  pouvez
+              modifier  la  liste  des champs affichés et leur ordonnancement.
+              Pour plus d’informations sur ces commandes interactives voir  le
+              sujet 2b. SÉLECTION et ORDONNANCEMENT des colonnes.
+
+         <S> : Bascule_Mode_Cumul_de_Temps
+              Quand  cette  option  est Actif, chacun des processus légers est
+              affiché   individuellement.   Autrement,    top    affiche    le
+              récapitulatif  de tous les processus légers du processus parent.
+
+         ´S´ : Bascule_Mode_Cumul_de_Temps
+              Lorsque l’option « Mode cumulatif » est Actif, chaque  processus
+              est  référencé  avec  le  temps cpu que lui et ses fils tués ont
+              utilisé.
+
+              Avec l’option Inactif, les programmes  qui  ont  été  clonés  en
+              plusieurs  tâches  distinctes apparaîtront moins gourmands. Pour
+              des programmes tels « init »  ou  un  interpréteur  de  commande
+              (shell),  ce  comportement  est  approprié,  mais pour d’autres,
+              comme  les  compilateurs,  ça   ne   l’est   probablement   pas.
+              Expérimentez  l’affichage  d’une liste identique de champs triés
+              dans 2 fenêtres de tâches mais avec différents états « S »  pour
+              vous forger une opinion sur le comportement que vous préférez.
+
+              Après l’exécution de cette commande, vous serez averti du nouvel
+              état de cette option. Si vous souhaitez savoir à l’avance si  le
+              « Mode  cumulatif »  est  activé,  affichez simplement l’aide et
+              consultez la deuxième ligne de la fenêtre récapitulative.
+
+         <u> :Utilisateur_Spécifique
+              Vous invite à saisir le  nom  de  l’utilisateur  à  afficher.  À
+              l’avenir,   dans  cette  fenêtre  de  tâches,  seront  affichées
+              uniquement les tâches de cet ID Utilisateur,  mais  il  se  peut
+              qu’il n’y en ait aucune.
+
+              Par  la  suite,  si vous désirez surveiller à nouveau l’ensemble
+              des tâches, ré-exécutez cette commande  en  appuyant  uniquement
+              sur la touche <Entrée> sans fournir de nom.
+
+       TAILLE de la fenêtre de tâches
+         <i> : Bascule_Processus_au_Repos
+              Affiche toutes les tâches ou seulement les tâches actives. Quand
+              cette option est Inactif, les processus au repos ou  zombies  ne
+              sont pas affichés.
+
+              Appliquée   au  dernier  écran  de  tâches,  en  mode  affichage
+              alternatif,  cette  commande  n’affecte  pas  la  taille  de  la
+              fenêtre,  vu  que  l’ensemble  des  écrans  de tâches précédents
+              auront déjà été dessinés.
+
+         <n> ou <#> : Ensemble_Maximum_de_Tâches
+              Vous invite à introduire le nombre  de  tâches  à  afficher.  Le
+              nombre de lignes affichées sera proportionnel au nombre saisi.
+
+              Utilisé  en  mode  affichage  alternatif,  cette  commande  vous
+              donnera un contrôle précis sur la taille de chacun des écrans de
+              tâches  actuels visibles, à l’exception du tout dernier. Elle ne
+              l’affectera pas, vu que tous les  écrans  de  tâches  précédents
+              auront déjà été dessinés.
+
+              Note : Si vous souhaitez accroître la taille du dernier écran de
+              tâches  visible,  en   mode   affichage   alternatif,   réduisez
+              simplement la taille de l’écran de tâches au-dessus de lui.
+
+       TRI de la fenêtre de tâches
+         Pour  des  raisons de compatibilité, cette version de top supporte la
+         plupart des touches de  tri  des  versions  précédentes.   Cependant,
+         puisqu’il  s’agit  essentiellement d’un service pour les utilisateurs
+         des versions précédentes de top,  ces  commandes  n’apparaissent  sur
+         aucun écran d’aide.
+          commande   champ trié                  supporté
+              A         démarrage (non affiché)       Non
+              M         %MEM                          Oui
+              N         PID                           Oui
+              P         %CPU                          Oui
+              T         TIME+                         Oui
+
+         Avant  l’utilisation  d’une quelconque des clés de tri suivantes, top
+         propose que vous activiez temporairement la surbrillance  de  colonne
+         en  utilisant  la  commande interactive « x », afin de vous conforter
+         dans l’assurance que l’environnement de tri actuel correspond  à  vos
+         intentions.
+
+         Les  commandes  interactives  suivantes  seront  seulement respectées
+         lorsque le champ du tri effectif  est   visible.   Les  raisons  pour
+         lesquelles le champ du tri peut être masqué sont :
+              1) une Largeur d'écran insuffisante,
+              2) la commande interactive « f » est positionnée sur Inactif.
+
+         <<> :Déplace_le_Champ_Tri_à_Gauche
+              Déplace la colonne de tri vers la gauche à moins que le champ de
+              tri effectif ne soit le premier de l’écran.
+
+         <>> :Déplace_le_Champ_Tri_à_Droite
+              Déplace la colonne de tri vers la droite à moins que le champ de
+              tri effectif ne soit le dernier de l’écran.
+
+         Les  commandes interactives suivantes seront toujours appliquées, que
+         les champs de tri effectifs soient visibles ou non.
+
+         <F> ou <O> :Choix_d'un_Champ_de_Tri
+              Ces  touches  présentent  un  écran  séparé   où   vous   pouvez
+              sélectionner la colonne de tri.
+
+              Lorsqu’un  champ  qui  n’était  pas affiché est sélectionné, son
+              activation sera forcée (Actif) au moment  où  vous  retournez  à
+              l’affichage  de  top.  Cependant, selon la largeur de l’écran et
+              l’ordonnancement de vos champs, ce champs de  tri  peut  ne  pas
+              être visible.
+
+              Cette   commande  interactive  peut  se  révéler  pratique  pour
+              contrôler  simplement  le  champ  de  tri  actuel,  lorsque  top
+              s’exécute  avec une option de surbrillance de colonne positionné
+              en Inactif.
+
+         <R> :Bascule_le_Champ_de_Tri_Inverse/Normal
+              En utilisant cette commande interactive,  vous  pouvez  basculer
+              entre des tris croissants et décroissants.
+
+         Note :  Le tri des champs utilise des valeurs internes, et non celles
+         affichées dans les  colonnes.  Donc,  les  champs  TTY  et  WCHAN  ne
+         respecterons pas l’ordre ASCII.
+
+   3d. Palette des COULEURS
+       L’utilisation de la commande interactive « Z » vous présentera un écran
+       séparé. Cet écran peut être utilisé pour modifier les  couleurs  de  la
+       seule  fenêtre « active » ou de l’ensemble des quatre fenêtres avant de
+       revenir à l’affichage principal.
+
+       Commandes interactives disponibles
+           4 majuscules pour choisir une cible
+           8 chiffres pour choisir une couleur
+           bascules classiques disponibles
+               « B »       : gras désactivé/activé
+               « b »       : tâches actives « gras »/inverse
+               « z »       : couleur/monochrome
+           autres commandes disponibles
+               « a »/« w » : applique, ensuite va au suivant/précédent
+               <Entrée>    : applique puis quitte
+               « q »       : abandonne les modifications actuelles puis quitte
+
+       En  utilisant  « a » ou « w » pour passer en revue les fenêtres cibles,
+       vous appliquerez le schéma de couleur affiché par la fenêtre  que  vous
+       êtes  en  train  de  quitter  aux fenêtres suivantes. Vous pouvez, bien
+       entendu, facilement retourner sur chacune des fenêtres et appliquer  de
+       nouveau   un  schéma  de  couleur  différent  ou  désactiver  (Inactif)
+       totalement les couleurs avec l’option « z ».
+
+       L’écran Palette des couleurs peut aussi être utilisé pour  modifier  la
+        fenêtre  « active »/groupe de champs dans chacun des modes plein écran
+       ou affichage alternatif. Quelque  soit  la  cible  au  moment  où  vous
+       saisissez  « q »  ou  <Entrée>,  elle deviendra active lors du retour à
+       l’affichage principal.
+
+4. Mode AFFICHAGE-ALTERNATIF
+
+   4a. Vue d’ensemble du FENÊTRAGE
+       Groupes de champs/Fenêtres :
+              En mode plein écran, une seule fenêtre  occupe  la  totalité  de
+              l’écran. Cette fenêtre unique peut toujours être remplacée par 1
+              des 4 groupes de champs différents  (voir  commande  interactive
+              « G »  ré-expliquée  ci-dessous). Chacun des 4 groupes de champs
+              dispose d’une zone  résumé  configurable  séparément  et  de  sa
+              propre zone de tâches également configurable.
+
+              En  mode  affichage  alternatif,  4 groupes sous-jacents peuvent
+              être visualisés simultanément ou peuvent être rendus Inactifs  à
+              volonté.
+
+              La  zone  résumé sera toujours présente, même s’il ne s’agit que
+              d’une ligne  de  message.   Une  seule  zone  résumé  peut  être
+              affichée  à  la fois. Cependant, selon vos directives, il peut y
+              avoir de zéro à quatre écrans de tâches séparés à l’écran.
+
+       Fenêtre Active :
+              La  fenêtre « active » est la fenêtre associée à la zone  résumé
+              et  la  fenêtre  vers  laquelle les commandes liées à leur tâche
+              sont toujours dirigées. Puisqu’en mode affichage alternatif vous
+              pouvez  rendre  Inactif  l’écran  de tâches, certaines commandes
+              peuvent être restreintes dans la  fenêtre « active ».
+
+              Une  difficulté  supplémentaire  apparaît  au   moment   de   la
+              désactivation de la première ligne de la zone résumé. En perdant
+              le nom de la fenêtre (la ligne de bascule « l »),  il  vous  est
+              difficile de savoir quelle fenêtre est active.
+
+   4b. COMMANDES de Fenêtrage
+         <-> et <_> : Montre/Masque_Fenêtres(s)
+              La  touche  « - »  active  et  désactive l’écran de tâches de la
+              fenêtre active. Inactif, la zone de tâches affichera le  minimum
+              possible   d’entêtes  de  colonnes  telles  que  vous  les  avez
+              déterminées avec les commandes « f » et  « o ».  Elle  reflétera
+              également  toutes  autres  dispositions (options/bascules) de la
+              zone de tâches que vous avez appliquées révélant zéro  tâche  ou
+              plus.
+
+              La touche « _ » a le même effet sur toutes les zones d’affichage
+              des tâches. En d’autres termes, elle bascule  entre  l’écran  de
+              tâches   visible   actuellement  et  toute(s)  autre(s)  zone(s)
+              d’affichage marquée(s) Inactif. Si les 4 zones d’affichage  sont
+              actuellement  visibles,  cette  commande interactive laissera la
+              zone résumé comme seul élément visible.
+
+       * <=> et <+> : égalise(rééquilibre)_la(les)_Fenêtre(s)
+              La  touche  « = »  force  l’écran  de  tâches  de  la    fenêtre
+              « active »  à  être visible. Elle inverse aussi toutes commandes
+              « i » (tâches au repos) et « n » (nombre de tâches maximum)  qui
+              peuvent être actives.
+
+              La  touche  « + »  a  le même effet sur toutes les fenêtres. Les
+              quatre zones d’affichage  des  tâches  réapparaîtront  avec  des
+              tailles  équilibrées.  Elles  conserveront  également toutes les
+              options que vous avez paramétrées, à l’exception  des  commandes
+              « i » (tâches au repos) et « n » (nombre de tâche maximum).
+
+       * <A> : Bascule_en_Mode_Affichage_Alternatif
+              Cette  commande  passera  du  mode plein écran en mode affichage
+              alternatif.
+
+              Lors d’une première  exécution,  les  quatre  zones  d’affichage
+              seront présentées. Ensuite, en basculant de mode, vous ne verrez
+              que les zones d’affichage des tâches que vous souhaitiez  rendre
+              visibles.
+
+       * <a> et <w> :Fenêtre_Suivante/Précédente
+              Ces commandes changeront de  fenêtre « active », présentant tour
+              à tour la fenêtre vers laquelle les commandes  seront  dirigées.
+              Ces   touches  agissent  de  manière  cyclique  vous  permettant
+              d’atteindre toute  fenêtre « active » souhaitée quelque soit  la
+              touche utilisée.
+
+              En  supposant que le nom de la fenêtre soit visible (vous n’avez
+              pas rendu «l » Inactif), à chaque fois  la   fenêtre  « active »
+              perd  sa mise en évidence/ses couleurs, rappelant que l’écran de
+              tâches  est  Inactif  et  que  de  nombreuses  commandes  seront
+              restreintes.
+
+       * <G> : Choix_d'une_Autre_Fenêtre/Groupe_de_Champs
+              Vous  invite  à  introduire  un nombre entre 1 et 4 désignant la
+              fenêtre/groupe de champs qui deviendra la  fenêtre « active ».
+
+              En mode plein  écran,  cette  commande  est  indispensable  pour
+              modifier  la   fenêtre « active ». En mode affichage alternatif,
+              il s’agit simplement d’un moyen moins pratique que les commandes
+              « a » et « w ».
+
+         <g> : Modifie_le_Nom_de_la__Fenêtre/Groupe_de_Champs
+              Vous  invite  à renommer la  fenêtre « active ». Cela ne demande
+              pas que le nom de la fenêtre soit  visible  (c’est  à  dire  que
+              l’option « l » soit Actif).
+
+       *  Les  commandes  interactives  présentées  avec un astérisque (« * »)
+          s’utilisent en mode affichage alternatif.
+              « = », « A », « G » sont toujours disponibles
+              « a », « w » agissent aussi de même sur la palette des couleurs
+
+5. FICHIERS
+
+   5a. Fichier de Configuration SYSTÈME
+       La présence de ce fichier influencera la version de l’écran  « d’aide »
+       présentée  à  un  simple utilisateur.  De manière plus fondamentale, il
+       bridera ce que ces utilisateurs pourront faire lorsque  top  s’exécute.
+       Ils ne seront pas capables d’exécuter les commandes suivantes :
+          k         Tuer une tâche
+          r         Redéfinir la politesse d’une tâche
+          d ou s    Modifier le délai/intervalle de repos
+
+       Le  fichier  de  configuration  système  n’est  pas  créé  par  top. Au
+       contraire, vous devrez créer ce fichier  manuellement  pour  le  placer
+       dans  le  répertoire /etc. Son nom doit être « toprc », il ne peut être
+       précédé de « . » (point). Il ne peut comporter que 2 lignes.
+
+       Voici un exemple du contenu de /etc/toprc :
+          s         # ligne 1 : mode « sécurisé »
+          5.0       # ligne 2 : « délai »  intervalle en secondes
+
+   5b. Fichier de Configuration PERSONNEL
+       Ce fichier se nomme « $HOME/.votre-nom-4-top » +  « rc ».  Utilisez  la
+       commande interactive « W » pour le créer ou le mettre à jour.
+
+       En voici la disposition générale :
+          global    # ligne 1 : notation du nom/alias du programme
+            "       # line 2: id,altscr,irixps,delay,curwin
+          per ea    # ligne a : winname,fieldscur
+          window    # line b: winflags,sortindx,maxtasks
+            "       # line c: summclr,msgsclr,headclr,taskclr
+
+       Si  la variable $HOME n’existe pas, top essayera de créer le fichier de
+       configuration personnel dans le répertoire courant,  en  se  conformant
+       aux autorisations d’accès.
+
+6. Échantillons d’ASTUCES IDIOTES
+       Nombre  de ces « astuces » fonctionnent mieux lorsque vous planifiez un
+       lancement de top. Aussi, prévoyez de  le  lancer  avec  une  valeur  de
+       politesse à -10, en supposant que vous ayez le droit de le faire.
+
+   6a. Magie du Noyau
+       Pour ce truc idiot, top demande le mode plein écran.
+
+       -*-  L’interface  utilisateur,  par  l’intermédiaire  d’invites  et  de
+            l’aide, incite à dessein à fixer un délai d’un dixième de seconde.
+            Cependant,  vous  êtes libre de déterminer un délai quelconque. Si
+            vous souhaitez  voir  le  meilleur  de  l’ordonnanceur  du  noyau,
+            essayez un délai de .09 seconde ou moins.
+
+            Pour  cette  expérience, sous x-window, ouvrez un terminal (xterm)
+            et maximisez-le.  Ensuite exécutez les instructions suivantes :
+              . programmez un démarrage et un délai court ainsi :
+                  nice -n -10 top -d.09
+              . désactivez la surbrillance de la colonne triée pour
+                 minimiser la longueur des chemins (« paths »)
+              . activez la surbrillance inverse des lignes pour les mettre
+                 en évidence
+              . essayez  plusieurs  tris  de  colonne  (TIME/MEM  fonctionnent
+            bien),
+                 et des tris croissants et décroissants pour amener
+                 à la vue les processus les plus actifs
+
+            Ce  que  vous verrez est un noyau vraiment très occupé de faire ce
+            qu’il fait toujours pour vous,  mais  sans  aucun  programme  pour
+            l’illustrer.
+
+       -*-  Dans  un  xterm utilisant des couleurs « blanc-sur-noir », essayez
+            de rafraîchir en noir les tâches de top  et  assurez-vous  que  la
+            surbrillance  des  tâches  est  positionnée  sur  gras  et  pas en
+            inverse. Ensuite positionnez le délai aux alentours de .3 seconde.
+
+            Après  avoir  amené  à  la vue les processus les plus actifs, vous
+            verrez uniquement les images fantômes des tâches qui  s’exécutent.
+
+       -*-  Effacez   le  fichier  rc  existant,  ou  créez  un  nouveau  lien
+            symbolique. Lancez cette nouvelle  version.  Ensuite  tapez  « T »
+            (une  touche  secrète,  voir  le sujet 3c. Commandes de la zone de
+            TÂCHES, Tri) suivi de « W » « q ». Enfin,  relancez  le  programme
+            avec l’option -d0 (délai zéro).
+
+            Votre   écran  top  se  rafraîchira  trois  fois  plus  rapidement
+            qu’auparavant, un gain de vitesse de 300 %. Pendant que top grimpe
+            l’échelle  de TIME, faites preuve d’autant de patience que vous le
+            pouvez en spéculant si oui ou non top atteindra un jour le top.
+
+   6b. Fenêtres Rebondissantes
+       Pour cette astuce idiote, top requière le mode affichage alternatif.
+
+       -*-  Avec 3 ou 4 zones d’affichage de tâches visibles, sélectionnez une
+            fenêtre autre que la dernière et positionnez l’option processus au
+            repos sur  Inactif.  Selon  l’endroit  ou  vous  appliquez  « i »,
+            parfois  plusieurs  zones  d’affichages des tâches rebondissent et
+            parfois elles évoluent en accordéon, vu que top fait de son  mieux
+            pour allouer l’espace.
+
+       -*-  Configurez  différemment pour chaque fenêtre les lignes de la zone
+            résumé :  une  sans  la  mémoire ;  une  autre  sans  les  états ;
+            éventuellement  une  sans rien du tout, en laissant juste la ligne
+            de message.  Ensuite  pressez  « a »  ou  « w »  et  observez  une
+            variante des fenêtres rebondissantes -- les fenêtres sautillantes.
+
+       -*-  Affichez l’ensemble des 4 fenêtres et  pour  chacune,  à  tour  de
+            rôle,  positionnez  l’option  processus  au  repos à Inactif. Vous
+            venez tout juste de pénétrer dans la  zone  des  « rebondissements
+            extrêmes ».
+
+   6c. La Fenêtre du Grand Oiseau
+       Ce truc idiot demande aussi le mode affichage alternatif.
+
+       -*-  Affichez l’ensemble des 4 fenêtres et assurez-vous que Def soit la
+             fenêtre « active ». Ensuite, augmentez progressivement la  taille
+            de  la  fenêtre jusqu’à ce que toutes les autres zones d’affichage
+            des tâches soient « chassées hors du nid »
+
+            Quand toutes  sont  déplacées,  basculez  l’option  fenêtre  toute
+            visible/invisible. Ensuite méditez ceci :
+               Est-ce que top vous gruge ou vous rapporte scrupuleusement
+               une vérité qui s’impose ?
+
+7. BOGUES
+
+       Faites parvenir vos rapports de bogues à :
+          Albert D. Cahalan, <albert@users.sf.net>
+
+8. HISTORIQUE des Versions Précédentes
+
+       Le top originel a été écrit par Roger Binns à partir du programme ps de
+       Branko Lankester’s <lankeste@fwi.uva.nl>.
+
+       Robert Nation <nation@rocket.sanders.lockheed.com> l’a adapté  pour  le
+       système de fichiers proc.
+
+       Helmut  Geyer  <Helmut.Geyer@iwr.uni-heidelberg.de> a ajouté le support
+       de configuration des champs.
+
+       Et de nombreuses contributions individuelles se sont  ajoutées  au  fil
+       des ans.
+
+9. AUTEURS
+
+       Cette version entièrement rénovée et améliorée a été écrite par :
+          Jim / James C. Warner, <warnerjc@worldnet.att.net>
+
+       Avec l’aide inestimable de :
+          Albert D. Cahalan, <albert@users.sf.net>
+          Craig Small, <csmall@small.dropbear.id.au>
+
+10. VOIR AUSSI
+
+       free(1), ps(1), uptime(1), atop(1), slabtop(1), vmstat(8), w(1).
+
+TRADUCTION
+
+       Cette  page  de  manuel  a  été  traduite et est maintenue par Philippe
+       Piette  <foudre-blanche@skynet.be>  et  les   membres   de   la   liste
+       <debian-l10n-french  AT  lists  DOT debian DOT org>.  Veuillez signaler
+       toute erreur de traduction par  un  rapport  de  bogue  sur  le  paquet
+       manpages-fr-extra.
+

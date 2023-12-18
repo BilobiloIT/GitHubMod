@@ -1,0 +1,1296 @@
+man tar 
+
+NOM
+
+tar - Utilitaire d’archivage
+SYNOPSIS
+
+Utilisation traditionnelle
+tar {A|c|d|r|t|u|x}[GnSkUWOmpsMBiajJzZhPlRvwo] [ARG...]
+
+Utilisation de style UNIX
+tar -A [OPTIONS] ARCHIVE ARCHIVE
+
+tar -c [-f ARCHIVE] [OPTIONS] [FICHIER...]
+
+tar -d [-f ARCHIVE] [OPTIONS] [FICHIER...]
+
+tar -t [-f ARCHIVE] [OPTIONS] [MEMBRE...]
+
+tar -r [-f ARCHIVE] [OPTIONS] [FICHIER...]
+
+tar -u [-f ARCHIVE] [OPTIONS] [FICHIER...]
+
+tar -x [-f ARCHIVE] [OPTIONS] [MEMBRE...]
+
+Utilisation de style GNU
+tar {--catenate|--concatenate} [OPTIONS] ARCHIVE ARCHIVE
+
+tar --create [--file ARCHIVE] [OPTIONS] [FICHIER...]
+
+tar {--diff|--compare} [--file ARCHIVE] [OPTIONS] [FICHIER...]
+
+tar --delete [--file ARCHIVE] [OPTIONS] [MEMBRE...]
+
+tar --append [-f ARCHIVE] [OPTIONS] [FICHIER...]
+
+tar --list [-f ARCHIVE] [OPTIONS] [MEMBRE...]
+
+tar --test-label [--file ARCHIVE] [OPTIONS] [ÉTIQUETTE...]
+
+tar --update [--file ARCHIVE] [OPTIONS] [FICHIER...]
+
+tar --update [-f ARCHIVE] [OPTIONS] [FICHIER...]
+
+tar {--extract|--get} [-f ARCHIVE] [OPTIONS] [MEMBRE...]
+NOTE
+
+Cette page de manuel est une courte description de GNU tar. Pour une explication détaillée comprenant des exemples et des recommandations d’utilisation, veuillez vous référer au manuel de GNU Tar disponible au format texinfo. Si le programme info et la documentation de tar sont correctement installés sur votre système, la commande
+
+info tar
+
+devrait vous donner accès au manuel complet.
+
+Vous pouvez aussi consulter le manuel en utilisant le mode info dans emacs(1), ou le trouver en ligne dans divers formats sur
+
+http://www.gnu.org/software/tar/manual
+
+Si des divergences entre ce manuel et le manuel de GNU Tar apparaissaient, ce dernier doit être considéré comme faisant autorité.
+DESCRIPTION
+
+GNU tar est un programme d’archivage conçu pour stocker plusieurs fichiers dans un seul (une archive) et pour manipuler de telles archives. L’archive peut être soit un fichier normal, soit un périphérique (par exemple, un lecteur de bande — tape drive — d’où le nom signifiant tape archiver), qui peut être situé sur une machine locale ou distante.
+
+Styles des options
+Les options pour GNU tar peuvent être indiquées de trois façons différentes. Dans le « style traditionnel », le premier argument est un groupe de lettres d’option et tous les arguments suivants fournissent les arguments nécessaires à ces options. Les arguments sont lus dans le même ordre que les lettres d’option. Chaque mot de la ligne de commande qui subsiste après que toutes les options aient été traitées, est considéré comme un argument non optionnel : un nom de membre de fichier ou d’archive.
+
+Par exemple, l’option c demande la création d’une archive, l’option v demande l’opération verbosité et l’option f prend un argument qui détermine le nom de l’archive sur laquelle agir. La commande suivante, écrite dans le style traditionnel, ordonne à tar de stocker tous les fichiers du répertoire /etc dans le fichier d’archive etc.tar de manière verbeuse en listant tous les fichiers archivés :
+
+tar cfv a.tar /etc
+
+Dans UNIX ou avec le style option courte, chaque lettre d’option est préfixée avec un tiret unique, comme dans les autres utilitaires en ligne de commande. Si une option prend un argument, celui-ci la suit, soit comme un mot séparé de la ligne de commande, ou immédiatement après cette option. Cependant, si cette option prend un argument facultatif, celui-ci doit suivre la lettre d’option sans espace intermédiaire, comme par exemple -g/tmp/snar.db.
+
+N’importe quel nombre d’options ne prenant pas d’argument peuvent être regroupées après un seul tiret, par exemple, -vkp. Les options prenant un argument (soit obligatoire ou facultatif) peuvent figurer à la fin d’un tel groupement, par exemple, -vkpf a.tar.
+
+L’exemple de commande ci-dessous écrit dans le style court peut apparaître ainsi :
+
+tar -cvf a.tar /etc
+
+ou
+tar -c -v -f a.tar /etc
+
+Dans GNU ou le style option longue, chaque option débute par deux tirets et possède un nom significatif, constitué de lettres minuscules et de tirets. Lorsqu’utilisée, une option longue peut être abrégée à ses initiales, pourvu que cela ne crée pas d’ambiguïté. Les arguments des options longues sont fournis soit comme mot séparé de la ligne de commande, immédiatement après l’option, ou comme mot séparé par un signe égal sans espace intermédiaire. Les arguments facultatifs doivent toujours utiliser la dernière méthode.
+
+Voici plusieurs façons d’écrire un exemple de commande de ce style :
+
+tar --create --file a.tar --verbose /etc
+ou (en abrégeant quelques options) :
+tar --cre --file=a.tar --verb /etc
+
+Les options des trois styles peuvent être mélangées, quoique que le faire avec les vieilles options ne soit pas préconisé.
+
+Mode d’opération
+Les options listées dans l’énumération ci-dessous indiquent à GNU tar quelle opération est à réaliser. Exactement, une d’entre elles doit être fournie. La signification des arguments non facultatifs dépend du mode d’opération demandé.
+-A, --catenate, --concatenate
+
+Joindre une archive à la fin d’une autre archive. Les arguments sont traités comme des noms d’archive à ajouter. Toutes les archives doivent être du même format que l’archive à laquelle elles sont ajoutées, autrement l’archive résultante pourrait ne pas être utilisable par les implémentations non GNU de tar. Il est à remarquer que si plus d’une archive est fournie, les membres de l’archive autres que le premier seront accessibles dans l’archive résultante seulement si l’option -i (--ignore-zeros) est utilisée.
+
+Les archives compressées ne peuvent être concaténées
+
+-c, --create
+
+Créer une nouvelle archive. Les arguments fournissent le nom des fichiers à archiver. Les répertoires sont archivés de manière récursive, à moins que l’option --no-recursion soit fournie.
+
+-d, --diff, --compare
+
+Trouver les différences entre l’archive et le système de fichiers. Les arguments sont facultatifs et indiquent les membres de l’archive à comparer. S’ils ne sont pas fournis, le répertoire de travail utilisé est présumé.
+
+--delete
+
+Supprimer de l’archive. Les arguments fournissent les noms des membres de l’archive à supprimer. Au moins un argument doit être fourni.
+
+Cette option est inopérante pour les archives compressées. Il n’existe pas d’option courte équivalente.
+
+-r, --append
+
+Joindre des fichiers à la fin d’une archive. Les arguments ont la même signification que pour -c (--create).
+
+-t, --list
+
+Lister le contenu d’une archive. Les arguments sont facultatifs. Lorsqu’ils sont fournis, ils précisent le nom des membres à lister.
+
+--test-label
+
+Tester l’étiquette du volume de l’archive et quitter. Lorsque cette option est utilisée sans argument, elle affiche l’étiquette du volume (si elle existe) et quitte avec comme état 0. Quand un ou plusieurs arguments de ligne de commande sont fournis, tar compare l’étiquette avec chaque argument. Il termine avec un état 0 si une correspondance est trouvée et avec le code 1 autrement. Aucune sortie n’est affichée à moins d’une utilisation de l’option -v (--verbose) option.
+
+Il n’existe pas d’option courte équivalente.
+
+-u, --update
+
+Joindre des fichiers plus récents que leurs copies correspondantes dans l’archive. Les arguments ont la même signification qu’avec les options -c et -r. Il est à remarquer que les nouveaux fichiers ne remplacent par les anciennes copies dans l’archive, mais sont plutôt ajoutés à la fin de celle-ci. L’archive résultante peut par conséquent contenir plusieurs membres du même nom, correspondant aux diverses versions du même fichier.
+
+-x, --extract, --get
+
+Extraire les fichiers d’une archive. Les arguments sont facultatifs. Lorsqu’ils sont fournis, ils précisent les membres de l’archive à extraire.
+
+--show-defaults
+
+Afficher les valeurs internes par défaut pour les différentes options de tar et quitter. Aucun argument n’est permis
+
+-?, --help
+
+Afficher un aide-mémoire des options courtes et quitter. Aucun argument n’est permis.
+
+--usage
+
+Afficher une liste des options disponibles et quitter. Aucun argument n’est permis.
+
+--version
+
+Afficher la version du programme et l’information de droits d’auteur et quitter.
+OPTIONS
+
+Modificateurs d’opération
+--check-device
+
+Vérifier les numéros de périphérique lors de la création d’archives incrémentales (comportement par défaut).
+
+-g, --listed-incremental=FICHIER
+
+Gérer les sauvegardes incrémentales au nouveau format GNU. FICHIER est le nom d’un fichier d’instantané où tar stocke les informations complémentaires utilisées pour déterminer quels fichiers ont changé depuis la dernier vidage (dump) incrémental et, par conséquent, doivent être copiés de nouveau. Si FICHIER n’existe pas lors de la création de l’archive, il sera créé et tous les fichiers seront ajoutés à l’archive résultante (le vidage de level 0). Pour créer des archives incrémentales de niveau N différent de zéro, il faut créer une copie du fichier d’instantané créé durant le niveau N-1 et l’utiliser comme FICHIER.
+
+Lors du listage ou de l’extraction, le contenu effectif de FICHIER n’est pas inspecté. Celui-ci est nécessaire uniquement pour des besoins syntaxiques. C’est pourquoi une pratique courante est d’utiliser /dev/null à sa place.
+
+--hole-detection=MÉTHODE
+
+Utiliser MÉTHODE pour détecter les trous des fichiers creux. Cette option implique --sparse. Les valeurs autorisées pour MÉTHODE sont seek et raw. La valeur par défaut est seek avec un repli sur raw si elle n’est pas applicable.
+
+-G, --incremental
+
+Gérer les sauvegardes incrémentales de l’ancien format GNU.
+
+--ignore-failed-read
+
+Ne pas quitter en renvoyant un code de retour non nul si des fichiers sont illisibles.
+
+--level=NUMÉRO
+
+Définir le niveau de vidage pour créer des archives incrémentales à l’aide de listes. Actuellement seulement --level=0 est valable. Il ordonne à tar de tronquer le fichier d’instantané avant le vidage, donc obligeant à un vidage de niveau 0.
+
+-n, --seek
+	
+
+Présumer que l’archive est adressable. Normalement tar détermine automatiquement si l’archive peut être parcourue ou pas. Cette option est destinée à être utilisée dans le cas où une telle reconnaissance échoue. Elle prend effet si seulement l’archive est ouverte en lecture (par exemple, avec les options --list ou --extract.
+				
+
+--no-check-device
+
+Ne pas vérifier les numéros de périphérique lors de la création d’archives incrémentales.
+
+--no-seek
+
+Présumer que l’archive n’est pas adressable.
+
+--occurrence[=N]
+
+Traiter seulement la Nième occurrence de chaque fichier dans l’archive. Cette option n’est valable qu’accompagnée de l’une des sous-commandes --delete, --diff, --extract ou  --list et lorsqu’une liste de fichiers est fournie soit sur la ligne de commande, soit avec l’option -T. N vaut 1 par défaut.
+
+--restrict
+
+Désactiver l’utilisation d’options potentiellement dommageables.
+
+--sparse-version=MAJEUR[.MINEUR]
+
+Définir la version du format « creux » (sparse) à utiliser. Cette option implique --sparse. Les valeurs d’argument valables sont 0.0, 0.1 et 1.0. Pour de plus amples détails, veuillez vous référer au manuel de GNU Tar, annexe D, "Sparse Formats". En utilisant l’afficheur info, ce manuel est consultable avec la commande : info tar ’Sparse Formats’.
+
+-S, --sparse
+
+Gérer les fichiers creux de manière efficace. Certains fichiers du système de fichiers peuvent contenir des segments qui ne sont en fait jamais écrits (la plupart du temps ce sont des fichiers de base de données créés par des systèmes tel DBM). Lorsque cette option est fournie, tar tente de déterminer si le fichier est creux avant de l’archiver, et si tel est le cas, de réduire la taille de l’archive résultante en ne copiant pas les parties vides du fichier.
+
+Contrôle d’écrasement.
+Ces options contrôlent les actions de tar lors de l’extraction d’un fichier au-dessus d’une copie existante sur le disque.
+-k, --keep-old-files
+
+Ne pas remplacer les fichiers existants lors de l’extraction.
+
+--keep-newer-files
+
+Ne pas remplacer les fichiers existants plus récents que leurs copies dans l’archive.
+
+--keep-directory-symlink
+
+Préserver les liens symboliques existants vers des dossiers lors de l’extraction.
+
+--no-overwrite-dir
+
+Préserver les métadonnées des dossiers existants.
+
+--one-top-level[=RÉP]
+
+Extraire tous les fichiers dans RÉP, ou, si aucun argument n’est fourni, dans un sous-répertoire appelé selon le nom de base de l’archive (sans les suffixes de compression standard identifiables avec --auto-compress).
+
+--overwrite
+
+Écraser les fichiers existants lors de l’extraction.
+
+--overwrite-dir
+
+Écraser les métadonnées des répertoires existants lors de l’extraction (comportement par défaut).
+
+--recursive-unlink
+
+Supprimer récursivement tous les fichiers du répertoire avant d’extraire par-dessus.
+
+--remove-files
+
+Supprimer les fichiers du disque après les avoir ajoutés dans l’archive.
+
+--skip-old-files
+
+Ne pas remplacer les fichiers existants lors de l’extraction. Ils sont omis silencieusement.
+
+-U, --unlink-first
+
+Supprimer chaque fichier avant d’extraire par-dessus.
+
+-W, --verify
+
+Vérifier l’archive après l’avoir écrite.
+
+Choix du flux de sortie
+--ignore-command-error
+Ignorer les codes renvoyés par les sous-processus.
+--no-ignore-command-error
+
+Considérer les codes de sortie non nuls des processus enfants comme des erreurs (par défaut).
+
+-O, --to-stdout
+
+Extraire les fichiers sur la sortie standard.
+
+--to-command=COMMANDE
+
+Diriger les fichiers extraits vers la COMMANDE. L’argument est le nom de chemin d’un programme externe, avec des arguments de ligne de commande facultatifs. Le programme sera appelé et le contenu du fichier extrait lui sera fourni sur son entrée standard. Des données supplémentaires seront fournies à l’aide des variables d’environnement suivantes :
+TAR_FILETYPE
+
+Type du fichier. Il s’agit d’une seule lettre ayant les significations suivantes :
+		
+		
+
+f
+		
+
+Regular file (fichier normal)
+		
+		
+
+d
+		
+
+Directory (répertoire)
+		
+		
+
+l
+		
+
+Symbolic link (lien symbolique)
+		
+		
+
+h
+		
+
+Hard link (lien physique)
+		
+		
+
+b
+		
+
+Block device (périphérique bloc)
+		
+		
+
+c
+		
+
+Character device (périphérique caractère)
+
+Actuellement, seuls les fichiers normaux sont pris en charge.
+
+TAR_MODE
+
+Mode de fichier, un nombre octal.
+
+TAR_FILENAME
+
+Le nom du fichier.
+
+TAR_REALNAME
+
+Nom du fichier tel qu’il est stocké dans l’archive.
+
+TAR_UNAME
+
+Nom du propriétaire du fichier.
+
+TAR_GNAME
+
+Nom du groupe propriétaire du fichier.
+
+TAR_ATIME
+
+Heure du dernier accès. C’est un nombre décimal représentant le nombre de secondes depuis « l’Époque ». Si l’archive fournit une précision de l’ordre des nanosecondes, celles-ci sont ajoutées à l’horodatage après un point décimal.
+
+TAR_MTIME
+
+Date de la dernière modification.
+
+TAR_CTIME
+
+Date du dernier changement d’état
+
+TAR_SIZE
+
+Taille du fichier.
+
+TAR_UID
+
+UID du propriétaire du fichier.
+
+TAR_GID
+
+GID du propriétaire du fichier.
+
+De plus, les variables suivantes contiennent des informations sur le mode d’opération de tar et de l’archive traitée :
+TAR_VERSION
+
+Numéro de version de GNU tar.
+
+TAR_ARCHIVE
+
+Le nom de l’archive traitée par tar.
+
+TAR_BLOCKING_FACTOR
+
+Coefficient de blocs en cours, c’est-à-dire le nombre de blocs de 512 octets dans un enregistrement.
+
+TAR_VOLUME
+
+Nombre ordinal du volume que tar traite (précisé si une archive multi-volume est lue).
+
+TAR_FORMAT
+
+Format de l’archive traitée qui peut être gnu, oldgnu, posix, ustar ou v7. TAR_SUBCOMMAND Option courte (précédée d’un tiret) décrivant l’opération exécutée par tar.
+
+Gestion des attributs de fichier
+--atime-preserve[=MÉTHODE]
+
+Conserver les dates d’accès des fichiers archivés, soit en les restaurant après lecture (MÉTHODE=replace par défaut), soit en ne définissant pas les dates initialement MÉTHODE=system).
+
+--delay-directory-restore
+
+Reporter à la fin de l’extraction le changement des dates de modification et des permissions des répertoires extraits. Utiliser cette option lors d’une extraction à partir d’une archive ayant un ordre des membres inhabituel.
+
+--group=NOM[:GID]
+
+Forcer NOM comme groupe pour les fichiers ajoutés. Si GID n’est pas fourni, NOM peut être soit un nom d’utilisateur ou un GID numérique. Dans ce cas, la partie manquante (GID ou nom) sera déduite de la base de données de groupes de l’hôte actuel.
+
+Lorsqu’utilisée avec --group-map=FICHIER, cela affecte seulement les fichiers dont le groupe propriétaire n’est pas listé dans FICHIER.
+
+--group-map=FICHIER
+
+Lire le carte de traduction de groupes à partir de FICHIER. Les lignes vides sont ignorées. Les commentaires débutent par un signe # et s’étendent jusqu’à la fin de la ligne. Chaque ligne non vide dans FICHIER définit la correspondance pour chaque groupe. Elle peut être constituée de deux champs délimités par n’importe quel nombre d’espaces :
+
+ANCIENGRP NOUVEAUGRP[:NOUVEAUGID]
+
+ANCIENGRP est soit un nom de groupe valable ou un GID préfixé par un +. À moins que NOUVEAUGID ne soit indiqué, NOUVEAUGRP doit être aussi soit un nom valable de groupe ou un +GID. Autrement, les deux NOUVEAUGRP et NOUVEAUGID n’ont pas besoin d’être listés dans la base de données de groupes du système.
+
+De ce fait chaque fichier d’entrée avec un groupe propriétaire ANCIENGRP sera stocké dans une archive avec comme groupe propriétaire NOUVEAUGRP et un GID NOUVEAUGID.
+
+--mode=CHANGEMENTS
+
+Forcer le mode symbolique CHANGEMENTS pour les fichiers ajoutés.
+
+--mtime=DATE-OU-FICHIER
+
+Définir mtime pour les fichiers ajoutés. DATE-OU-FICHIER est soit une date/heure dans à peu près n’importe quel format ou le nom d’un fichier existant. Dans le dernier cas, le mtime de ce fichier sera utilisé.
+
+-m, --touch
+
+Ne pas extraire la date modifiée du fichier.
+
+--no-delay-directory-restore
+
+Annuler l’effet de l’option --delay-directory-restore.
+
+--no-same-owner
+
+Extraire les fichiers en votre nom (comportement par défaut pour un utilisateur ordinaire).
+
+--no-same-permissions
+
+Appliquer le masque de droits lors de l’extraction des permissions de l’archive (comportement par défaut pour un utilisateur ordinaire).
+
+--numeric-owner
+
+Utiliser systématiquement des nombres pour les noms d’utilisateur ou de groupe.
+
+--owner=NOM[:UID]
+
+Forcer NOM comme propriétaire pour les fichiers ajoutés. Si UID n’est pas précisé, NOM peut être soit un nom d’utilisateur ou un UID numérique. Dans ce cas, la partie manquante (UID ou nom) sera déduite de la base de données d’utilisateurs de l’hôte.
+
+Lorsqu’utilisé avec --owner-map=FICHIER, cela affecte seulement les fichiers dont le propriétaire n’est pas listé dans FICHIER.
+
+--owner-map=FICHIER
+
+Lire la carte de traduction d’utilisateurs à partir de FICHIER. Les lignes vides sont ignorées. Les commentaires débutent par un signe # et s’étendent jusqu’à la fin de la ligne. Chaque ligne non vide dans FICHIER définit la correspondance pour un UID unique. Elle peut être constituée de deux champs délimités par n’importe quel nombre d’espaces :
+
+ANCIENUTILISATEUR NOUVELUTILISATEUR[:NOUVELUID]
+
+ANCIENUTILISATEUR est soit un nom d’utilisateur valable ou un UID préfixé avec +. À moins que NEWUID ne soit précisé, NOUVELUTILISATEUR doit être soit un nouveau nom d’utilisateur valable ou un +UID. Autrement, NOUVELUTILISATEUR et NOUVELUID n’ont pas besoin d’être listés dans la base de données d’utilisateurs du système.
+
+De ce fait chaque fichier d’entrée possédé par ANCIENUTILISATEUR sera stocké dans une archive avec comme nom de propriétaire NOUVELUTILISATEUR et un UID NOUVELUID.
+
+-p, --preserve-permissions, --same-permissions
+
+Extraire les informations sur les permissions de fichiers (comportement par défaut pour le superutilisateur).
+
+--preserve
+
+Identique à -p et -s.
+
+--same-owner
+
+Essayer d’extraire les fichiers avec les mêmes propriétaires que ceux dans l’archive (comportement par défaut pour le superutilisateur).
+
+-s, --preserve-order, --same-order
+
+Trier les noms pour extraire en correspondance avec l’archive.
+
+--sort=ORDRE
+
+Lors de la création d’une archive, trier les entrées de répertoires selon ORDRE, qui est soit none, name ou inode.
+
+La valeur par défaut est --sort=none qui stocke les membres de l’archive dans le même ordre que celui renvoyé par le système d’exploitation.
+
+Utiliser --sort=name assure que l’ordre des membres dans l’archive créée est constant et reproductible.
+
+Utiliser --sort=inode réduit le nombre de recherches dans le disque lors de la création de l’archive et donc augmente considérablement la vitesse d’archivage. Cet ordre de tri est seulement pris en charge si le système fournit les informations nécessaires.
+
+Attributs étendus de fichier
+	
+
+--acls
+		
+
+Activer la prise en charge des ACL POSIX.
+	
+
+--no-acls
+
+Désactiver la prise en charge des ACL POSIX.
+
+--selinux
+
+Activer la prise en charge du contexte SELinux.
+
+--no-selinux
+
+Désactiver la prise en charge du contexte SELinux.
+
+--xattrs
+
+Activer la prise en charge des attributs étendus.
+
+--no-xattrs
+
+Désactiver la prise en charge des attributs étendus.
+
+--xattrs-exclude=MOTIF
+
+Préciser le motif d’exclusion pour les clés de xattr. MOTIF est une expression rationnelle POSIX normale, par exemple, --xattrs-exclude=’^user.’, pour exclure des noms d’attribut de l’espace de noms de l’utilisateur.
+
+--xattrs-include=MOTIF
+
+Préciser le motif d’inclusion pour les clés de xattr. MOTIF est une expression rationnelle POSIX normale.
+
+Sélection du périphérique et commutation
+-f, --file=ARCHIVE
+
+Utiliser le fichier ou le périphérique ARCHIVE. Si cette option n’est pas fournie, tar examinera d’abord la variable d’environnement TAPE. Si elle est définie, sa valeur sera utilisée comme nom d’archive. Sinon, tar adoptera la valeur interne par défaut. Celle-ci peut être consultée soit en utilisant l’option --show-defaults ou à la fin de la sortie de tar --help.
+
+Un nom d’archive comportant un deux-points indique un fichier ou un périphérique sur une machine distante. La partie avant le deux-points est considérée comme le nom de la machine ou une adresse IP et la partie après comme le nom de chemin du fichier ou du périphérique, par exemple :
+
+--file=hôtedistant:/dev/sr0
+
+De manière facultative, un nom d’utilisateur peut être préfixé au nom d’hôte en plaçant un signe @.
+
+Par défaut, l’hôte distant est atteint à l’aide de la commande rsh(1). À présent ssh(1) est plutôt utilisé couramment. Vous pouvez le faire en fournissant l’option de ligne de commande suivante :
+
+--rsh-command=/usr/bin/ssh
+
+La machine distante devrait avoir la commande rmt(8) installée. Si son nom de chemin ne correspond pas à la valeur de tar par défaut, vous pouvez indiquer à tar le chemin correct en utilisant l’option --rmt-command.
+
+--force-local
+
+Le fichier d’archive est local même si un deux-points existe.
+
+-F, --info-script=COMMANDE, --new-volume-script=COMMANDE
+
+Exécuter COMMANDE à la fin de chaque bande (-M sous-entendu). La commande peut comporter des arguments. Au démarrage, elle héritera de l’environnement de tar et des variables suivantes :
+TAR_VERSION
+
+Numéro de version de GNU tar.
+
+TAR_ARCHIVE
+
+Le nom de l’archive traitée par tar.
+
+TAR_BLOCKING_FACTOR
+
+Coefficient de blocs en cours, c’est-à-dire le nombre de blocs de 512 octets dans un enregistrement.
+
+TAR_VOLUME
+
+Nombre ordinal du volume que tar traite (précisé si une archive multi-volume est lue).
+
+TAR_FORMAT
+
+Format de l’archive traitée. Une des valeurs : gnu, oldgnu, posix, ustar ou v7.
+
+TAR_SUBCOMMAND
+
+Option courte (précédée d’un tiret) décrivant l’opération que tar exécute.
+	
+
+TAR_FD
+		
+
+Descripteur de fichier pouvant être utilisé pour transmettre le nouveau nom de volume à tar.
+
+Si le script d’information échoue, tar quitte. Sinon il commence à écrire le prochain volume.
+
+-L, --tape-length=N
+
+Changer de bande après l’écriture de Nx1024 octets. Si N est suivi par un suffixe de taille (consulter la sous-section Suffixes de taille ci-dessous), celui-ci indique un facteur de multiplication à utiliser au lieu de 1024.
+
+Cette option implique -M.
+
+-M, --multi-volume
+
+Créer, lister ou extraire une archive multivolume.
+
+--rmt-command=COMMANDE
+
+Utiliser COMMANDE au lieu de rmt pour accéder à des archives distantes. Consulter la description de l’option -f ci-dessus.
+
+--rsh-command=COMMANDE
+
+Utiliser COMMANDE au lieu de rsh pour accéder à des archives distantes. Consulter la description de l’option -f ci-dessus.
+
+--volno-file=FICHIER
+
+Quand cette option est utilisée conjointement avec --multi-volume, tar garde une trace de chaque volume d’une archive multivolume qu’il traite dans FICHIER.
+
+Blocage de périphérique
+-b, --blocking-factor=BLOCS
+
+Définir la taille d’enregistrement à BLOCSx512 octets.
+
+-B, --read-full-records
+
+Lors du listage ou de l’extraction, accepter des enregistrements d’entrée incomplets après le marqueur EOF.
+
+-i, --ignore-zeros
+
+Ignorer les blocs constitués de zéros dans l’archive. Normalement, deux blocs de 512 octets consécutifs remplis de zéros signifient EOF et tar cesse sa lecture après leur rencontre. Cette option commande de lire plus loin et est utile lors de la lecture d’archives créées avec l’option -A.
+
+--record-size=NOMBRE
+
+Définir la taille d’enregistrement. NOMBRE est le nombre d’octets par enregistrement. Il doit être un multiple de 512. Il peut avoir un suffixe de taille, par exemple, --record-size=10K, pour 10 kilo-octets. Consulter la sous-section Suffixes de taille pour une liste de suffixes autorisés.
+
+Sélection du format d’archive
+-H, --format=FORMAT
+
+Créer une archive du format précisé. Les formats autorisés sont :
+	
+
+gnu
+		
+
+format GNU tar 1.13.x ;
+	
+
+oldgnu
+		
+
+format GNU pour les versions de tar <= 1.12 ;
+
+pax, posix
+
+format POSIX 1003.1-2001 (pax) ;
+	
+
+ustar
+		
+
+format POSIX 1003.1-1988 (ustar) ;
+	
+	
+
+v7
+		
+
+ancien format tar V7.
+	
+
+--old-archive, --portability
+
+Identique à --format=v7.
+
+--pax-option=motclé[[:]=valeur][,motclé[[:]=valeur]]...
+
+Contrôler les mots-clés lors de la création d’archives PAX (-H pax). Cette option est équivalente à l’option -o de l’utilitaire pax(1).
+
+--posix
+
+Identique à --format=posix.
+
+-V, --label=TEXTE
+
+Créer une archive avec comme nom de volume TEXTE. Lors du listage ou de l’extraction, utiliser TEXTE comme motif avec caractères génériques pour le nom de volume.
+
+Options de compression
+-a, --auto-compress
+
+Utiliser le suffixe de l’archive pour déterminer le logiciel de compression.
+
+-I, --use-compress-program=COMMANDE
+
+Traiter les données avec COMMANDE. L’option -d doit être acceptée pour la décompression. L’argument peut contenir des options de ligne de commande.
+
+-j, --bzip2
+
+Traiter l’archive avec bzip2(1).
+
+-J, --xz
+
+Traiter l’archive avec xz(1).
+	
+
+--lzip
+		
+
+Traiter l’archive avec lzip(1).
+	
+	
+
+--lzma
+		
+
+Traiter l’archive avec lzma(1).
+	
+	
+
+--lzop
+		
+
+Traiter l’archive avec lzop(1).
+	
+
+--no-auto-compress
+
+Ne pas utiliser le suffixe de l’archive pour déterminer le logiciel de compression.
+
+-z, --gzip, --gunzip, --ungzip
+
+Traiter l’archive avec gzip(1).
+
+-Z, --compress, --uncompress
+
+Traiter l’archive avec compress(1).
+	
+
+--zstd
+		
+
+Traiter l’archive avec zstd(1).
+	
+
+Sélection des fichiers locaux
+--add-file=FICHIER
+
+Ajouter FICHIER à l’archive (utile si son nom commence par un tiret).
+
+--backup[=CONTROLE]
+
+Sauvegarder avant la suppression. L’argument CONTROLE, si fourni, contrôle la politique de sauvegarde. Les valeurs autorisées sont :
+none, off
+
+Ne jamais réaliser de sauvegarde.
+
+t, numbered
+
+Faire des sauvegardes numérotées.
+
+nil, existing
+
+Faire des sauvegardes numérotées s’il en existe ou autrement de simples sauvegardes.
+
+never, simple
+
+Toujours réaliser des sauvegardes simples.
+
+Si CONTROLE n’est pas fourni, la valeur est déterminée par la variable d’environnement VERSION_CONTROL. Si elle n’est pas définie, existing est adopté.
+
+-C, --directory=RÉP
+
+Changer à RÉP avant de réaliser toute opération. Cette option est sensible à l’ordre, c’est-à-dire qu’elle affecte toutes les options qui suivent.
+
+--exclude=MOTIF
+
+Exclure tous les fichiers correspondant au MOTIF, un motif de jokers de style glob(3).
+
+--exclude-backups
+
+Exclure les fichiers de verrouillage et de sauvegarde.
+
+--exclude-caches
+
+Exclure le contenu des répertoires contenant un fichier CACHEDIR.TAG, sauf le fichier d’étiquette lui-même.
+
+--exclude-caches-all
+
+Exclure le contenu des répertoires contenant un fichier CACHEDIR.TAG ainsi que le fichier d’étiquette lui-même.
+
+--exclude-caches-under
+
+Exclure tout le contenu des dossiers contenant CACHEDIR.TAG.
+
+--exclude-ignore=FICHIER
+
+Avant de copier un répertoire, rechercher s’il contient FICHIER. Auquel cas, lire les motifs d’exclusion à partir de ce fichier. Les motifs ne concernent que le répertoire lui-même.
+
+--exclude-ignore-recursive=FICHIER
+
+Même chose que --exclude-ignore, excepté que les motifs de FICHIER affectent le répertoire et ses sous-répertoires.
+
+--exclude-tag=FICHIER
+
+Exclure le contenu des répertoires contenant le FICHIER, sauf le FICHIER lui-même.
+
+--exclude-tag-all=FICHIER
+
+Exclure du traitement les dossiers contenant FICHIER.
+
+--exclude-tag-under=FICHIER
+
+Exclure du traitement tout le contenu des dossiers contenant FICHIER.
+
+--exclude-vcs
+
+Exclure les répertoires du système de gestion de versions.
+
+--exclude-vcs-ignores
+
+Exclure les fichiers correspondant aux motifs lus à partir de fichiers ignore spécifiques aux systèmes de gestion de versions. Les fichiers pris en charge sont :.cvsignore, .gitignore, .bzrignore et .hgignore.
+
+-h, --dereference
+
+Suivre les liens symboliques. Archiver et copier les fichiers pointés.
+
+--hard-dereference
+
+Suivre les liens matériels. Archiver et copier les fichiers pointés.
+
+-K, --starting-file=MEMBRE
+
+Commencer à partir du membre indiqué dans l’archive.
+
+--newer-mtime=DATE
+
+Traitement des fichiers dont les données ont changé après la DATE. Si DATE débute avec / ou ., cela est considéré comme un nom de fichier. Le mtime de ce fichier est utilisé comme date.
+
+--no-null
+
+Désactiver l’effet de l’option --null précédente.
+
+--no-recursion
+
+Empêcher le parcours automatique des sous-répertoires.
+
+--no-unquote
+
+Ne pas supprimer les noms des fichiers ou membres d’entrée.
+
+--no-verbatim-files-from
+
+Traiter chaque ligne lue sur une liste de fichiers comme si elle était fournie sur la ligne de commande. C’est-à-dire que les espaces de début ou de fin sont supprimées et, si la chaîne résultante commence par un tiret, elle est traitée comme une option de la ligne de commande de tar.
+
+C’est le comportement par défaut. L’option --no-verbatim-files-from est fournie comme une manière de le restaurer après l’option --verbatim-files-from.
+
+Cette option est positionnelle : elle affecte toutes les options --files-from qui apparaissent après, jusqu’à l’option --verbatim-files-from ou la fin de la ligne, peu importe ce qui arrive en premier.
+
+Elle est sous-entendue par l’option --no-null.
+	
+
+--null
+		
+
+Commander aux options -T suivantes de lire mot pour mot les noms terminés par NULL (désactivation de la gestion spéciale de noms débutant par un tiret).
+
+Consulter aussi --verbatim-files-from.
+
+-N, --newer=DATE, --after-date=DATE
+
+Stocker uniquement les fichiers plus récents que DATE. Si DATE débute par / or . il est considéré comme un nom de fichier. Le ctime de ce fichier est utilisé comme date.
+
+--one-file-system
+
+Ne pas quitter le système de fichiers local lors de la création de l’archive.
+
+-P, --absolute-names
+
+Ne pas enlever les barres obliques de début des noms de fichiers lors de la création de l’archive.
+
+--recursion
+
+Explorer récursivement les répertoires (comportement par défaut).
+
+--suffix=CHAÎNE
+
+Sauvegarder avant suppression, en écrasant le suffixe habituel. Le suffixe par défaut est ~, à moins qu’il n’ait été modifié par la variable d’environnement SIMPLE_BACKUP_SUFFIX.
+
+-T, --files-from=FICHIER
+
+Obtenir les noms à extraire ou à créer depuis FICHIER.
+
+À moins d’indication contraire, le FICHIER doit contenir une liste de noms séparés par des LF ASCII (c’est-à-dire, un nom par ligne). Les noms lus sont gérés de la même manière que les arguments de ligne de commande. Ils sont soumis à la suppression des protections et au découpage de mots, et toute chaîne débutant par - est gérée comme une option de ligne de commande de tar.
+
+Si ce comportement est indésirable, il peut être désactivé en utilisant l’option --verbatim-files-from.
+
+L’option --null commande à tar que les noms dans FICHIER soient séparés par le caractère ASCII NUL, au lieu de LF. Cela est utile si la liste est créée par un prédicat find(1) -print0.
+
+--unquote
+
+Enlever les protections des noms de fichier ou de membre (comportement par défaut).
+
+--verbatim-files-from
+
+Traiter chaque ligne obtenue d’une liste de fichiers comme un nom de fichier, même si elle débute par un tiret. Les listes de fichiers sont fournies par l’option --files-from (-T). Le comportement par défaut est de gérer les noms fournis dans les listes de fichiers comme s’ils étaient saisis sur la ligne de commande, c’est-à-dire que tout nom commençant par un tiret est traité comme une option de tar. L’option --verbatim-files-from désactive ce comportement.
+
+Cette option affecte toutes les options --files-from qui apparaissent après elle sur la ligne de commande. Cet effet est inversé par l’option --no-verbatim-files-from.
+
+Cette option est implicite à l’option --null.
+
+Consulter aussi --add-file.
+
+-X, --exclude-from=FICHIER
+
+Exclure les fichiers correspondants aux motifs listés dans FICHIER.
+
+Afficher les transformations de noms.
+--strip-components=NOMBRE
+
+Supprimer les NOMBRE composants de tête des noms de fichier à extraire.
+
+--transform=EXPRESSION, --xform=EXPRESSION
+
+Utiliser sed remplacement EXPRESSION pour transformer les noms de fichier.
+
+Options de correspondance de nom de fichier
+Ces options affectent les motifs d’exclusion et d’inclusion.
+--anchored
+
+Motifs de recherche correspondant au début du nom de fichier.
+
+--ignore-case
+
+Ignorer la casse.
+
+--no-anchored
+
+Motifs de recherche correspondant après n’importe quel / (comportement par défaut pour les exclusions).
+
+--no-ignore-case
+
+Tenir compte de la casse dans les correspondances (comportement par défaut).
+
+--no-wildcards
+
+Rechercher des chaînes mot pour mot.
+
+--no-wildcards-match-slash
+
+Pas de correspondance des jokers avec /.
+
+--wildcards
+
+Utiliser des jokers (comportement par défaut pour les exclusions).
+
+--wildcards-match-slash
+
+Correspondance des jokers avec / (comportement par défaut pour les exclusions).
+
+Sorties informatives
+--checkpoint[=N]
+
+Afficher des messages de progression tous les N enregistrements (10 par défaut).
+
+--checkpoint-action=ACTION
+
+Exécuter ACTION à chaque point de vérification.
+
+--clamp-mtime
+
+Définir la date uniquement si la création du fichier est plus récente que la date donnée avec --mtime.
+
+--full-time
+
+Afficher la date des fichiers avec le maximum de précision.
+
+--index-file=FICHIER
+
+Écrire une sortie détaillée dans FICHIER.
+
+-l, --check-links
+
+Afficher un message si l’ensemble des liens n’a pas pu être copié.
+
+--no-quote-chars=CHAÎNE
+
+Désactiver la protection des caractères de CHAÎNE.
+
+--quote-chars=CHAÎNE
+
+Ajouter les caractères de protection de CHAÎNE.
+
+--quoting-style=STYLE
+
+Définir le style de protection pour les noms de fichiers et de membres. Les valeurs autorisées pour STYLE sont literal, shell, shell-always, c, c-maybe, escape, locale, clocale.
+
+-R, --block-number
+
+Afficher le numéro de bloc au sein de l’archive avec chaque message.
+
+--show-omitted-dirs
+
+Lister chaque dossier qui ne correspond pas au critère de recherche lors du listage ou de l’extraction de l’archive.
+
+--show-transformed-names, --show-stored-names
+
+Afficher le nom des fichiers ou des archives après transformation par les options --strip et --transform.
+
+--totals[=SIGNAL]
+
+Afficher le nombre total d’octets après traitement de l’archive. Si SIGNAL est fourni, afficher ce nombre quand ce signal est émis. Les signaux permis sont : SIGHUP, SIGQUIT, SIGINT, SIGUSR1 et SIGUSR2. Le préfixe SIG peut être omis.
+	
+
+--utc
+		
+
+Afficher les dates de modification des fichiers en heure universelle (UTC).
+
+-v, --verbose
+
+Afficher la liste détaillée des fichiers traités.
+
+--warning=MOTCLÉ
+
+Activer ou désactiver les messages d’avertissement identifiés par MOTCLÉ. Les messages sont supprimés si MOTCLÉ est préfixé par no- et activés autrement.
+
+Plusieurs messages --warning peuvent s’ajouter.
+
+Mots-clés contrôlant les opérations générales de tar :
+	
+
+all
+		
+
+Activer tous les messages d’avertissement. C’est le comportement par défaut.
+	
+
+none
+		
+
+Désactiver tous les messages d’avertissement.
+
+filename-with-nuls
+
+"%s: nom de fichier lu contenant un caractère NULL"
+
+alone-zero-block
+
+"bloc de zéros isolé dans %s"
+	
+
+Mots-clés applicables pour tar --create :
+	
+
+cachedir
+
+"%s: étiquette incluse de répertoire de cache %s; %s"
+
+file-shrank
+
+"%s: fichier réduit de %s octets, remplissage avec des zéros"
+	
+
+xdev
+		
+
+"%s: fichier sur un système de fichiers différent, non copié"
+
+file-ignored
+
+"%s: type de fichier inconnu, fichier ignoré"
+"%s: socket ignoré"
+"%s: appel door ignoré"
+
+file-unchanged
+
+"%s: file non modifié, non copié"
+
+ignore-archive
+
+"%s: le fichier est l’archive, non copié"
+
+file-removed
+
+"%s: fichier supprimé avant sa lecture"
+
+file-changed
+
+"%s: fichier modifié en cours de lecture"
+
+failed-read
+
+Suppression des avertissements à propos des fichiers ou répertoires non lisibles. Ce mot-clé s’applique uniquement s’il est utilisé conjointement avec l’option --ignore-failed-read.
+	
+
+Mots-clés applicables pour tar --extract :
+	
+
+existing-file
+
+"%s: fichier existant ignoré"
+
+timestamp
+
+"%s: ancien horodatage peu plausible %s"
+"%s: horodatage %s de %s s dans le futur"
+
+contiguous-cast
+
+"Extraction de fichiers contigus comme des fichiers normaux"
+
+symlink-cast
+
+"Essai d’extraction de liens symboliques comme des liens physiques"
+
+unknown-cast
+
+"%s: type de fichier ’%c’ inconnu, extraction comme un fichier normal"
+
+ignore-newer
+
+"%s actuel est plus récent ou du même âge"
+
+unknown-keyword
+
+"Mot-clé d’en-tête étendu inconnu non pris en compte ’%s’"
+
+decompress-program
+
+Contrôler la description verbeuse des échecs lors d’essai d’exécution de programmes alternatifs de décompression. Cet avertissement est désactivé par défaut (sauf si --verbose est utilisé). Un exemple courant de ce qui peut être obtenu en utilisant cet avertissement est :
+
+$ tar --warning=decompress-program -x -f archive.Z
+tar (child): cannot run compress: No such file or directory
+tar (child): trying gzip
+
+Cela signifie que tar essaie d’abord de décompresser archive.Z en utilisant compress, et, lors d’un échec, utiliser gzip.
+
+record-size
+
+"Taille d’enregistrement = %lu blocs"
+	
+
+Mots-clés contrôlant l’extraction incrémentale :
+	
+
+rename-directory
+
+"%s: répertoire renommé depuis %s"
+"%s: répertoire renommé"
+
+new-directory
+
+"%s: nouveau répertoire"
+	
+
+xdev
+		
+
+"%s: répertoire sur un périphérique différent, pas de purge"
+
+bad-dumpdir
+
+"répertoire de vidage mal formé, « X » jamais utilisé"
+
+-w, --interactive, --confirmation
+
+Demander une confirmation pour chaque action.
+
+Options de compatibilité
+	
+
+-o
+		
+
+Lors de création, identique à --old-archive, lors de l’extraction, identique --no-same-owner.
+
+Suffixes de taille
+Suffixe Unité Équivalence en octet
+
+b
+	
+
+blocs
+	
+
+TAILLE x 512
+B
+	
+	
+
+kilooctets
+	
+
+TAILLE x 1024
+c
+	
+	
+
+octets
+	
+
+TAILLE
+G
+	
+	
+
+gigaoctets
+	
+
+TAILLE x 1024^3
+K
+	
+	
+
+kilooctets
+	
+
+TAILLE x 1024
+k
+	
+	
+
+kilooctets
+	
+
+TAILLE x 1024
+M
+	
+	
+
+mégaoctets
+	
+
+TAILLE x 1024^2
+P
+	
+	
+
+pétaoctets
+	
+
+TAILLE x 1024^5
+T
+	
+	
+
+téraoctets
+	
+
+TAILLE x 1024^4
+w
+	
+	
+
+mots
+	
+
+TAILLE x 2
+	
+VALEUR RENVOYÉE
+
+Le code de retour de tar indique s’il a pu réaliser l’opération demandée, et sinon, le type d’erreurs rencontrées.
+	
+
+0
+		
+
+Achever avec succès
+	
+
+1
+		
+
+Quelques fichiers diffèrent. Si tar a été invoqué avec l’option de ligne de commande --compare (--diff, -d), cela signifie que quelques fichiers dans l’archive ne sont pas identiques à leurs homologues sur le disque. Si tar a reçu les options --create, --append ou --update, ce code de retour signifie que certains fichiers ont été modifiés durant l’archivage et donc que l’archive résultante ne contient pas une copie exacte de l’ensemble des fichiers.
+	
+
+2
+		
+
+Erreur fatale. Cela signifie q’une erreur fatale et irrécupérable s’est produite.
+
+Si un sous-processus appelé par tar s’est terminé avec un état différent de zéro, tar lui-même se termine avec ce même code. Cela peut se produire, par exemple, si une option de compression (telle que -z) était utilisée et que le programme externe de compression échouait. Un autre exemple est un échec de rmt lors de la sauvegarde vers un périphérique distant.
+VOIR AUSSI
+
+bzip2(1), compress(1), gzip(1), lzma(1), lzop(1), rmt(8), symlink(7), xz(1).
+
+Pour un manuel complet de tar, exécutez info tar ou utilisez le mode information d’emacs(1) pour le lire.
+
+Des copies en ligne de la documentation de GNU tar dans des formats différents peuvent être consultées sur :
+
+http://www.gnu.org/software/tar/manual
+SIGNALEMENTS DE BOGUES
+
+Signaler toute erreur à <bug-tar [AT] gnu.org>.
+COPYRIGHT
+
+Copyright © 2013 Free Software Foundation, Inc.
+Licence GPLv3+ : GNU GPL version 3 ou ultérieure <http://gnu.org/licenses/gpl.html>;
+Ce programme est un logiciel libre. Vous pouvez le modifier et le redistribuer. Il n’y a AUCUNE GARANTIE dans la mesure autorisée par la loi.
+
+La traduction française de cette page de manuel a été créée par Valéry Perrin <valery.perrin.debian [AT] free.fr>, Thomas Huriaux <thomas.huriaux [AT] gmail.com>, Florentin Duneau <fduneau [AT] gmail.com>, Thomas Blein <tblein [AT] tblein.eu> et David Prévot <david [AT] tilapin.org>
+
+Cette traduction est une documentation libre ; veuillez vous reporter à la GNU General Public License version 3 concernant les conditions de copie et de distribution. Il n’y a aucune RESPONSABILITÉ LÉGALE.
+
+Si vous découvrez un bogue dans la traduction de cette page de manuel, veuillez envoyer un message à <debian-l10n-french [AT] lists.org>.
+Available in
+(1) (3) (5) (1)/de (1)/es (1)/fi (1)/fr (1)/hu (1)/it (1)/ja (1)/ko (1)/nl (1)/pl (1)/zh_CN (1)/zh_TW
+Contents
+
+    NOM
+    SYNOPSIS
+    NOTE
+    DESCRIPTION
+    OPTIONS
+    VALEUR RENVOYÉE
+    VOIR AUSSI
+    SIGNALEMENTS DE BOGUES
+    COPYRIGHT
+
+A splitbrain.org Service | Back to top 

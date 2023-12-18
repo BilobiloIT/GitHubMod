@@ -1,0 +1,408 @@
+man ping 
+
+
+NOM
+
+       ping, ping6 - envoyer des datagrammes ICMP ECHO_REQUEST à des hôtes sur
+       un réseau
+
+SYNOPSIS
+
+       ping    [-LRUbdfnqrvVaAB]   [-c nombre]   [-m marque]   [-i intervalle] 
+       [-l préchargement] [-p motif] [-s taille_paquet] [-t ttl] [-w deadline]
+       [-F étiquette_flux] [-I interface]  [-M conseil] [-N nioption] [-Q tos]
+       [-S sndbuf] [-T timestamp option] [-W timeout] [hop ...] destination
+
+       ping  utilise   le  datagramme  ECHO_REQUEST  du  protocole  ICMP  afin 
+       d'obtenir une réponse ICMP ECHO_RESPONSE  de la part d'un hôte ou d'une
+       passerelle.  Les datagrammes ECHO_REQUEST comprennent un en-tête IP  et
+       un  en-tête  ICMP,  suivis  d'une  « struct timeval »  et  d'un  nombre
+       arbitraire d'octets de bourrage utilisés pour remplir le paquet. 
+
+       ping6 peut également envoyer des requêtes ICMPv6 d'interrogation  dites
+       « Node Information Queries » (cf. RFC 4620).
+
+OPTIONS
+
+       -a
+              ping audible.
+
+       -A
+              ping adaptatif.  L'intervalle inter-paquets  s'adapte  au  délai
+              aller-retour (« round-trip time », ou rtt),  afin  qu'il n'y ait
+              pas plus d'une sonde sans réponse (ou plus,  si le préchargement
+              est utilisé) sur le réseau. L'intervalle minimal  est  de 200 ms
+              pour les utilisateurs normaux (non super-utilisateurs).  Sur les
+              réseaux de rtt faible,  ce mode est quasiment équivalent au mode
+              inondation. 
+
+       -b     
+              Permet de « pinger » une adresse de diffusion (broadcast).
+
+       -B
+              Interdit  à   ping  de  changer  l'adresse  source  des  sondes. 
+              L'adresse est liée à celle sélectionnée au démarrage de ping.
+
+       -m marque
+              Utilise une marque pour tagguer les paquets en sortie.  Ceci est
+              parfois utile au noyau pour diverses raisons.
+
+       -c nombre
+              S'arrêter après l'envoi de nombre paquets ECHO_REQUEST.  Combiné
+              à l'option  -w deadline,  ping  doit recevoir ses nombre paquets
+              ECHO_REPLY avant que la temporisation n'expire.
+
+       -d
+              Fixe  l'option  SO_DEBUG  sur la socket utilisée.  Cette  option
+              n'est probablement pas utilisée par le noyau Linux.
+
+       -F étiquette_flux
+              Alloue  et  inscrit  une étiquette de flux de 20 bits  dans  les
+              paquets echo request (ping6 uniquement).  Si la valeur est zéro,
+              le noyau crée une étiquette de flux aléatoire.
+
+       -f
+              Mode inondation (dit « Flood »).Pour chaque ECHO_REQUEST envoyé,
+              un  point  est  affiché,  et  pour  chaque ECHO_REPLY  reçu,  un
+              effacement  arrière  (backspace)  est  affiché.  Ceci  donne  un
+              affichage rapide du nombre de paquets qui ont été jetés. 
+              Si aucun intervalle n'est fourni,  ping fixe l'intervalle à zéro
+              et émet  des paquets  dès qu'en  reviennent  d'autres,  avec  un
+              minimum de 100 fois/s.  Seul le super-utilisateur  peut utiliser
+              cette option avec un intervalle à zéro. 
+
+       -i intervalle
+              Attendre intervalle secondes  entre chaque  envoi de paquet.  Le
+              délai par défaut est normalement d'une seconde  (ou nul  en mode
+              inondation). Seul le super-utilisateur peut fixer l'intervalle à
+              des valeurs inférieures à 0.2 secondes.
+
+       -I adresse_interface
+              Fixe  l'adresse source  à l'adresse  de  l'interface  spécifiée.
+              L'argument  peut être  une adresse IP numérique  ou  le nom d'un
+              périphérique.  Cette option  est  requise  lorsque  l'on  désire
+              « pinger » une adresse IPv6 link-local.
+
+       -l préchargement
+              Si préchargement est spécifié,  ping envoie ce nombre de paquets
+              sans  attendre  de  réponse.   Seul  le  super-utilisateur  peut
+              sélectionner un préchargement supérieur à 3.
+
+       -L
+              Enlève la  boucle locale (« loopback ») des adresses réceptrices
+              de  paquets  multi-destinataires  (multicast).   Ce  drapeau  ne
+              s'applique  que  si  la destination  du  ping  est  une  adresse
+              multi-destinataire. 
+
+       -N nioption
+              Envoie   des  requêtes  ICMPv6  d'interrogation  dites   «  Node
+              Information Queries » (cf. RFC 4620), à la place de traditionels
+              « Echo Request ».
+
+              name   Demande le nom des noeuds.
+
+              ipv6   Demande des adresses IPv6. Plusieurs drapeaux :
+
+                     ipv6-global
+                            Requiert des adresses IPv6 « global-scope »
+
+                     ipv6-sitelocal
+                            Requiert des adresses IPv6 « site-local »
+
+                     ipv6-linklocal
+                            Requiert des adresses IPv6 « link-local »
+
+                     ipv6-all
+                            Requiert des adresses IPv6 sur d'autres interfaces
+
+              ipv4   Demande des adresses IPv4. Un seul drapeau ici :
+
+                     ipv4-all
+                            Requiert des adresses IPv4 sur d'autres interfaces
+
+              subject-ipv6=ipv6addr
+                     adresse « IPv6 subject »
+
+              subject-ipv4=ipv4addr
+                     adresse « IPv4 subject »
+
+              subject-name=nom_noeud
+                     Nom du noeud. S'il contient plus d'un point (.),  il sera
+                     considéré comme un nom complet. 
+
+              subject-fqdn=nom_noeud
+                     Nom du noeud.  Il sera  toujours considéré  comme  un nom
+                     complet.
+
+
+       -n
+              Nombres  uniquement,  les  noms  symboliques  correspondant  aux
+              adresses d'hôtes ne sont pas recherchés.
+
+       -p motif
+              Vous pouvez spécifier jusqu'à 16 octets de bourrage pour remplir
+              complètement  le paquet  à  envoyer.  Ceci  est  utile  dans  le
+              diagnostic  des problèmes  dépendant des données dans un réseau.
+              Par exemple,  -p ff forcera le remplissage du paquet envoyé avec
+              des 1. 
+
+       -D
+              Affiche un horodatage avant chaque ligne.  Le timestamp respecte
+              le format  utilisé par  la  fonction gettimeofday  (temps unix +
+              microsecondes). Cette option n'est pas toujours disponible.
+
+       -Q tos
+              Positionne les bits relatifs à la  Qualité de Service (QoS) dans
+              les  datagrammes ICMP.  tos (le type  de service)  peut être  un
+              nombre  décimal  ou hexadécimal.  Traditionnellement (RFC 1349),
+              les 8 bits  de l'octet  sont  interprétés  comme  suit :  0  est
+              réservé   (ou   redéfinit   dans  le  domaine  du  contrôle  des
+              congestions ?),  1-4  pour le type de  service,  et 5-7  pour la
+              Priorité.  Des valeurs possibles  pour tos sont :  coût  minimal
+              0x02, fiabilité 0x04,  débit 0x08, faible délai 0x10.  Plusieurs
+              bits de tos  ne devraient pas  être utilisés simultanément.  Des
+              possibilités pour la Priorité  vont de priorité normale (0x20) à
+              supervision  réseau  (0xe0).  Vous  devez  être  root  (capacité
+              CAP_NET_ADMIN)  pour pouvoir utiliser  une priorité Critique  ou
+              plus  élevée.  Vous  ne  pouvez  pas  positionner  le  bit  0x01
+              (réservé)  à moins que  l'ECN (Explicit Congestion Notification)
+              n'ait été activée dans le noyau.  Dans le document RFC 2474, ces
+              champs ont été  redéfinis  pour  former  un  octet  destiné  aux
+              services  différenciés (Differentiated Services, DS),  constitué
+              des bits 0-1 de données indépendantes (ECN sera utilisé ici)  et
+              des bits 2-7  du Differentiated Services Codepoint (DSCP)  (NdT:
+              DiffServ  bénéficie  en effet  d'une certaine popularité dans ce
+              domaine).
+
+       -q
+              Sortie silencieuse. Rien n'est affiché sauf les lignes de résumé
+              au démarrage et à la fin de l'exécution. 
+
+       -R
+              Enregistre le  cheminement (ou route).  Pour  ce  faire,  inclut
+              l'option RECORD_ROUTE dans le paquet ECHO_REQUEST  et affiche le
+              tampon route  des  paquets  retournés.  Notez  que  l'en-tête IP
+              ne  peut  contenir  que  neuf de ces routes  au  plus.  Beaucoup
+              d'hôtes ignorent ou rejettent cette option. 
+
+       -r
+              N'utilise pas les tables de routage normales, envoie les paquets
+              directement  à  un hôte présent  sur  une interface  directement
+              connectée.  Si l'hôte n'est pas situé dans un réseau directement
+              connecté,  une erreur  est  retournée.  Cette option  peut  être
+              utilisée   pour  « pinger »  un  hôte  local  au  travers  d'une
+              interface  ne  faisant partie  d'aucune route  à  condition  que
+              l'option -I soit également utilisée. 
+
+       -s taille_paquet
+              Spécifie le nombre d'octets de données à envoyer.  Le nombre par
+              défaut est 56,  ce qui se traduit  en 64 octets  de données ICMP
+              quand  ils  sont  combinés  avec  les  8 octets  de  données  de
+              l'en-tête ICMP (NdT : et 84 octets avec 20 octets d'en-tête IP). 
+
+
+       -S sndbuf
+              Fixe le tampon d'émission (sndbuf) de la socket.Si non spécifié,
+              le buffer ne contiendra pas plus d'un paquet. 
+
+       -t ttl
+              Spécifie le champ IP « Time to Live ».
+
+       -T option-horodate
+              Spécifie  des  options  spéciales   concernant  l'horodatage  IP
+              (timestamps).  Le  champ  option-horodate  peut  être  :  tsonly
+              (uniquement les timestamps),  tsandaddr (timestamps et adresses)
+              ou  tsprespec hôte1 [hôte2 [hôte3 [hôte4]]]  (sauts préspécifiés
+              horodatés). 
+
+       -M conseil
+              Fixe la stratégie de découverte du « path MTU » (NdT : taille du
+              plus large paquet  pouvant suivre la route souhaitée  sans subir
+              de fragmentation): conseil peut être soit do (ne pas fragmenter,
+              même  en  local),    want  (effectuer  la  découverte  du  PMTU,
+              fragmenter localement quand la taille du paquet est importante),
+              ou dont (ne pas spécifier le drapeau DF). 
+
+       -U
+              Affiche  le  délai  de  latence total  utilisateur-à-utilisateur
+              (c'est l'ancien comportement).  Normalement, ping affiche le rtt
+              du  réseau,  qui peut être  différent,  par exemple  à cause  de
+              problèmes du DNS.
+
+       -v
+              Sortie verbeuse.
+
+       -V
+              Afficher le numéro de version.
+
+       -w deadline
+              Fixe un délai (en secondes),  avant que  ping ne mette fin à son
+              exécution quel que  soit le nombre de  paquets envoyés ou reçus.
+              Note :  ici,  ping ne s'arrêtera pas  après l'envoi  de quelques
+              paquets, mais attendra que le délai expire  ou que nombre sondes
+              aient reçu une réponse (NdT : si combiné à -c), ou encore qu'une
+              notification d'erreur provienne du réseau. 
+
+       -W timeout
+              Temps d'attente d'une réponse (en secondes) (NdT : ?)
+
+
+       Lorsque  vous  utilisez  ping  pour localiser  des pannes,  il  devrait
+       d'abord être exécuté sur l'hôte local, afin de vérifier que l'interface
+       réseau  locale  est  activée  et  fonctionne  correctement.   Seulement
+       ensuite,  les  hôtes  et  les  passerelles  de  plus en  plus  éloignés
+       devraient  être  « pingés ».  Les délais  d'aller-retour (rtt)  et  les
+       statistiques  de  perte  de  paquets  sont  calculés.  Si  des  paquets
+       dupliqués sont reçus,  ils ne sont pas inclus dans le calcul des pertes
+       de paquets, bien que leur délai d'aller-retour soit pris en compte pour
+       déterminer  les délais d'aller-retour minimum/moyen/maximum.  Quand  le
+       nombre de paquets spécifié a été envoyé (et reçu),  ou si  le programme
+       est  terminé  par un signal SIGINT,  un bref résumé  est  affiché.  Des
+       statistiques actuelles plus brèves  peuvent être obtenues sans terminer
+       le processus en utilisant le signal SIGQUIT. 
+
+       Si ping ne reçoit aucun paquet en réponse, il se terminera avec un code
+       de retour de 1.  Si une « deadline » et un nombre de paquets  sont tous
+       deux spécifiés (NdT : options -c et -w), et que moins de nombre paquets
+       ont été reçus avant l'heure limite, ping se terminera également avec un
+       code  de retour de 1.  En cas d'autre erreur,  le code de retour est 2.
+       Sinon,  il s'agit de 0.  Cela permet d'utiliser le code de sortie  pour
+       déterminer si un hôte est actif ou non.
+
+       Ce programme est destiné aux cas de tests,  de mesure et de gestion des
+       réseaux.  A cause de la charge  qu'il peut imposer au réseau,  il n'est
+       probablement pas indiqué d'utiliser ping en production,  ou à partir de
+       scripts automatisés.  
+
+DÉTAILS D'UN PAQUET ICMP
+
+       Un  en-tête  IP  sans  option  comporte  20  octets.   Un  paquet  ICMP
+       ECHO_REQUEST  contient 8 octets supplémentaires d'en-tête ICMP,  suivis
+       d'une  quantité arbitraire de données.  Quand une taille de paquet  est
+       fournie  (NdT :  avec l 'option -s),  elle indique  la taille  de cette
+       partie   de  données  supplémentaires  (56  octets  par  défaut).   Par
+       conséquent,  la quantité de données reçues à l'intérieur d'un paquet IP
+       de type ICMP ECHO_REPLY sera toujours de 8 octets supérieure à l'espace
+       requis par les données (l'en-tête ICMP). 
+
+       Si l'espace occupé par les données est d'au moins la taille d'un struct
+       timeval, ping utilise les premiers octets de cet espace (NdT : les huit
+       premiers octets)  pour inclure un horodatage (timestamp)  qu'il utilise
+       dans le calcul des délais d'aller-retour (rtt).  Si cet espace est plus
+       restreint, aucun délai d'aller-retour n'est donné.
+
+PAQUETS DUPLIQUÉS ET ENDOMMAGÉS
+
+       ping signalera les paquets dupliqués ou endommagés.  Une duplication de
+       paquets ne devrait jamais se produire : elles semblent être causées par
+       des  retransmissions  inadéquates  au  niveau  liaison de données.  Des
+       duplications peuvent se produire dans de nombreuses situations, et sont
+       rarement  (pour ne pas dire jamais)  un bon signe ;  la présence  d'une
+       faible proportion de paquets dupliqués  ne doit cependant pas  toujours
+       inquiéter. 
+  
+       Les paquets endommagés constituent de fait  une cause sérieuse d'alerte
+       et indiquent souvent une panne matérielle quelque part sur le chemin du
+       paquet ping (dans le réseau ou chez les hôtes).  
+
+DISCRIMATIONS SELON LE CONTENU
+
+       La   couche  (inter)réseau   ne  devrait  jamais  traiter  des  paquets
+       différemment en fonction des données qu'ils contiennent (dans la partie
+       de données).  Malheureusement ont été signalés des problèmes dépendants
+       des données,  qui s'immiscent dans les réseaux  et restent non détectés
+       pendant une longue période de temps. Dans beaucoup de cas, le motif qui
+       aura  des  problèmes  est  celui  ne  comportant  pas  suffisamment  de
+       « transitions »,  comme par exemple  tous des 1 ou tous 0,  ou bien  un
+       motif proche (comme par exemple presque uniquement des 0). 
+       Il ne suffit pas  nécessairement  de spécifier  un motif de données  ne
+       comportant que des zéros (par exemple) sur la ligne de commandes, étant
+       donné que le motif  qui entre en jeu est  celui qui se trouve au niveau
+       liaison de données,  et que la relation  entre ce que vous tapez  et ce
+       qui sera réellement envoyé sur le réseau  par les contrôleurs peut être
+       complexe. 
+
+       Cela signifie que si vous rencontrez un problème dépendant des données,
+       vous  devrez  probablement  effectuer   beaucoup  de  tests   afin   de
+       l'identifier plus précisément. Si vous avez de la chance, vous pourriez
+       trouver un fichier qui ne peut pas être envoyé sur votre réseau, ou qui
+       prend beaucoup plus de temps  à être transféré que d'autres fichiers de
+       taille  similaire.  Vous pouvez  ensuite examiner  ce fichier  afin  de
+       trouver des motifs qui s'y répètent,  motifs que vous pouvez tester  en
+       utilisant l'option -p de ping.  
+
+À PROPOS DU TTL
+
+       La  valeur  ttl  (« Time  To Live »,  durée  de  vie)  d'un  paquet  IP
+       représente  le nombre maximum de routeurs IP que ce paquet est autorisé
+       à traverser  avant d'être jeté.  Dans  la pratique,  vous  pouvez  vous
+       attendre  à ce que chaque routeur sur Internet décrémente  le champ TTL
+       d'exactement une unité  (NdT : des exceptions peuvent exister, et, pour
+       une raison quelconque,  le champ TTL peut être décrémenté davantage par
+       un routeur donné).
+
+       La spécification TCP/IP  précise que  le champ TTL destiné  aux paquets
+       devrait être fixé à 60,  mais certains anciens  systèmes d'exploitation
+       utilisent des valeurs différentes  (BSD 4.3 utilise 30,  la version 4.2
+       utilisait 15)  (NdT : cette valeur n'est dans les faits que peu souvent
+       60.  Sur la plupart des Linux avec noyau 2.6.x,  le champ TTL  est fixé
+       par défaut à 64, par exemple).
+
+       La valeur maximale de ce champ est 255.
+
+       Normalement,  ping affiche la valeur ttl du paquet qu'il reçoit.  Quand
+       un système distant  reçoit un paquet ping,  il peut faire  trois choses
+       avec le champ TTL dans sa réponse :
+
+       o Ne pas le changer ; c'est ce que faisaient les systèmes Unix Berkeley
+         avant la version BSD 4.3 Tahoe.  Dans ce cas, la valeur ttl du paquet
+         reçu sera de 255 moins le nombre de routeurs traversés  sur le chemin
+         aller-retour.  
+
+       o Le fixer à 255 ; c'est ce que font les systèmes Unix Berkeley actuels
+         (NdT : à voir). Dans ce cas, la valeur ttl du paquet reçu sera de 255
+         moins le nombre de routeurs traversés sur le chemin allant du système
+         distant à l'hôte effectuant le ping.
+
+       o Le fixer  à une autre valeur.  Certaines machines  utilisent  la même
+         valeur pour les paquets ICMP et TCP,  par exemple 30 ou 60.  D'autres
+         peuvent utiliser des valeurs peu conformes aux pratiques courantes.
+
+BOGUES
+
+       o Beaucoup d'hôtes et de passerelles ignorent l'option RECORD_ROUTE.
+
+       o La taille maximale  de l'en-tête IP  est  trop petite  pour  que  des
+         options comme RECORD_ROUTE soient vraiment utiles.  On ne peut pas  y
+         faire grand chose. 
+
+       o Inonder de pings (« Flood pinging ») n'est en général pas recommandé,
+         et  inonder de pings  l'adresse de diffusion générale (broadcast)  ne
+         devrait être fait que dans des circonstances très particulières et/ou
+         sous contrôle. 
+
+VOIR AUSSI
+
+       netstat(1), ifconfig(8).
+
+HISTORIQUE
+
+       La commande ping est apparue dans BSD 4.3.
+
+       La version décrite ici est son descendant spécifique à Linux.   
+
+SÉCURITÉ
+
+       La commande ping requiert  la capacité CAP_NET_RAWIO  pour pouvoir être
+       exécutée. Elle peut être utilisée via set-uid root. 
+
+DISPONIBILITÉ
+
+       ping fait partie  du paquetage iputils ;  les dernières versions  (code
+       source) sont disponibles ici : www.skbuff.net/iputils/
+
+TRADUCTION
+
+       Frédéric Delanoy <delanoy_f at yahoo.com>, 2002.
+       Révisé pour ce site par l'équipe man-linux-magique.net (Septembre 2010)
+

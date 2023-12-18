@@ -1,0 +1,224 @@
+man chown
+
+NOM
+
+       chown, fchown, lchown - Modifier l’appartenance d’un fichier
+
+SYNOPSIS
+
+       #include <unistd.h>
+
+       int chown(const char *path, uid_t owner, gid_t group);
+       int fchown(int fd, uid_t owner, gid_t group);
+       int lchown(const char *path, uid_t owner, gid_t group);
+
+   Exigences  de  macros  de  test  de  fonctionnalités  pour  la  glibc (voir
+   feature_test_macros(7)) :
+
+       fchown(), lchown() : _BSD_SOURCE || _XOPEN_SOURCE >= 500
+
+       Ces appels système modifient le propriétaire et le groupe d’un fichier.
+       Ils diffèrent seulement dans la façon dont le fichier est spécifié :
+
+       * chown()  modifie l’appartenance du fichier indiqué dans path, qui est
+         déréférencé s’il s’agit d’un lien symbolique.
+
+       * fchown()  modifie  l’appartenance  du  fichier   référencé   par   le
+         descripteur de fichier ouvert fd.
+
+       * lchown()  est  comme  chown(),  mais  ne  déréférence  pas  les liens
+         symboliques.
+
+       Seul un processus privilégié  (sous  Linux :  un  processus  qui  a  la
+       capacité  CAP_CHOWN)  peut  modifier  le  propriétaire d’un fichier. Le
+       propriétaire peut modifier le groupe du  fichier  pour  n’importe  quel
+       groupe auquel il appartient. Un processus privilégié (sous Linux : avec
+       la capacité CAP_CHOWN) peut modifier le groupe arbitrairement.
+
+       Si l’argument owner ou group vaut -1, l’élément correspondant n’est pas
+       changé.
+
+       Quand  le  propriétaire,  ou  le  groupe  d’un  fichier exécutable sont
+       modifiés par un utilisateur ordinaire, les bits S_ISUID et S_ISGID sont
+       effacés.  POSIX  ne précise pas s’il faut agir de même lorsque c’est le
+       superutilisateur qui invoque chown(). Le comportement de Linux dans  ce
+       cas  dépend  de la version du noyau. Si le fichier n’est pas exécutable
+       par les membres de son groupe (c’est-à-dire un fichier pour  lequel  le
+       bit  S_IXGRP  n’est pas positionné), le bit S_ISGID indique la présence
+       d’un verrou obligatoire sur le fichier, et n’est donc pas effacé par un
+       chown().
+
+VALEUR RENVOYÉE
+
+       En  cas  de  réussite,  zéro est renvoyé, sinon -1 est renvoyé et errno
+       contient le code d’erreur.
+
+ERREURS
+
+       Suivant le type de système de fichiers, plusieurs erreurs peuvent  être
+       renvoyées. Les plus courantes pour chown() sont les suivantes :
+
+       EACCES L’accès  à  un  élément  du  chemin  est  interdit.  (Voir aussi
+              path_resolution(7).)
+
+       EFAULT path pointe en dehors de l’espace d’adressage accessible.
+
+       ELOOP  path contient  une  référence  circulaire  (à  travers  un  lien
+              symbolique)
+
+       ENAMETOOLONG
+              path est trop long.
+
+       ENOENT Le fichier n’existe pas.
+
+       ENOMEM Pas assez de mémoire pour le noyau.
+
+       ENOTDIR
+              Un élément du chemin d’accès n’est pas un répertoire.
+
+       EPERM  Le  processus appelant n’a pas les permissions nécessaires (voir
+              plus haut) pour modifier le propriétaire et/ou le groupe.
+
+       EROFS  Le fichier spécifié réside sur un système de fichiers en lecture
+              seule.
+
+       Les erreurs courantes pour fchown() sont les suivantes :
+
+       EBADF  Le descripteur de fichier est invalide.
+
+       EIO    Une  erreur  d’entrée-sortie bas niveau s’est produite durant la
+              modification de l’inœud.
+
+       ENOENT Voir plus haut.
+
+       EPERM  Voir plus haut.
+
+       EROFS  Voir plus haut.
+
+CONFORMITÉ
+
+       BSD 4.4, SVr4, POSIX.1-2001.
+
+       La version BSD 4.4 ne peut être appelée que par le superutilisateur (ce
+       qui signifie qu’un utilisateur ordinaire ne peut pas céder la propriété
+       d’un fichier).
+
+NOTES
+
+       Lorsq’un  nouveau  fichier  est  créé  (par  exemple  avec  open(2)  ou
+       mkdir(2)),  son  propriétaire  est  le  même  que  l’UID  du système de
+       fichiers  du  processus  créateur.  Le  groupe  du  fichier  dépend  de
+       plusieurs  facteurs,  incluant  le  type  du  système  de fichiers, les
+       options utilisées pour monter le système de fichiers, et si le  bit  de
+       permission  SGID est activé pour le répertoire parent. Si le système de
+       fichiers  accepte  les  options  -o grpid  (ou   de   façon   identique
+       -o bsdgroups)  et  -o nogrpid  (ou de façon identique -o sysvgroups) de
+       mount(8), les règles sont alors les suivantes :
+
+       * Si le système de fichiers est monté avec l’option -o grpid, le groupe
+         du nouveau fichier est celui du répertoire parent.
+
+       * Si le système de fichiers est monté avec l’option -o nogrpid et si le
+         bit SGID est déactivé pour le répertoire parent, le groupe du nouveau
+         fichier est le GID du système de fichiers du processus.
+
+       * Si le système de fichiers est monté avec l’option -o nogrpid et si le
+         bit SGID est activé pour le répertoire parent, le groupe  du  nouveau
+         fichier est celui du répertoire parent.
+
+       Dans  Linux 2.6.25,  les options de montage -o grpid et -o nogrpid sont
+       acceptées par ext2, ext3, ext4 et XFS. Les  systèmes  de  fichiers  qui
+       n’acceptent  pas  ces options de montage suivent les règles de l’option
+       -onogrpid.
+
+       La sémantique de chown() est volontairement modifiée sur  les  systèmes
+       de  fichiers NFS où la correspondance d’UID est activée. De plus, c’est
+       la sémantique de tous  les  appels  système  accédant  au  contenu  des
+       fichiers   qui  est  modifiée,  puisque  chown()  peut  déclencher  une
+       interdiction immédiate d’accès à des fichiers déjà  ouverts.  Un  cache
+       situé  du  côté  client  peut  induire  un  délai  entre  l’instant  où
+       l’appartenance du fichier est modifiée et  le  moment  où  l’accès  est
+       effectivement accordé à l’utilisateur.
+
+       Dans  les versions de Linux antérieures à 2.1.81 (sauf 2.1.46), chown()
+       ne suivait pas les liens symboliques.  Depuis  cette  version,  chown()
+       suit  les  liens  symboliques,  et  il  existe un nouvel appel système,
+       lchown(), qui ne les suit pas. Depuis Linux  2.1.86,  ce  nouvel  appel
+       système (qui a donc la même sémantique que l’ancien chown()) a pris son
+       numéro de syscall, et chown() a reçu un nouveau numéro.
+
+EXEMPLE
+
+       Le programme suivant change le propriétaire d’un fichier  fourni  comme
+       second   paramètre   de  la  ligne  de  commande,  en  l’attribuant  au
+       propriétaire fourni en premier argument. Le nouveau  propriétaire  peut
+       être  précisé  par  une valeur numérique ou par le nom de l’utilisateur
+       (qui sera converti en UID avec  getpwnam(3)  pour  rechercher  dans  le
+       fichier des mots de passe du système.
+
+       #include <pwd.h>
+       #include <stdio.h>
+       #include <stdlib.h>
+       #include <unistd.h>
+
+       int
+       main(int argc, char *argv[])
+       {
+           uid_t uid;
+           struct passwd *pwd;
+           char *endptr;
+
+           if (argc != 3 || argv[1][0] == '\0') {
+               fprintf(stderr, "%s <propriétaire> <fichier>\n", argv[0]);
+               exit(EXIT_FAILURE);
+           }
+
+           uid = strtol(argv[1], &endptr, 10);  /* Permet une chaîne numérique */
+
+           if (*endptr != '\0') {         /* N’était pas une chaîne numérique */
+               pwd = getpwnam(argv[1]);    /* Essai de récupérer l’UID de l’utilisateur */
+               if (pwd == NULL) {
+                   perror("getpwnam");
+                   exit(EXIT_FAILURE);
+               }
+
+               uid = pwd->pw_uid;
+           }
+
+           if (chown(argv[2], uid, -1) == -1) {
+               perror("chown");
+               exit(EXIT_FAILURE);
+           } /* if */
+
+           exit(EXIT_SUCCESS);
+       } /* main */
+
+VOIR AUSSI
+
+       chmod(2), fchownat(2), flock(2), path_resolution(7), symlink(7)
+
+COLOPHON
+
+       Cette  page  fait  partie  de  la  publication 3.23 du projet man-pages
+       Linux. Une description du projet et des instructions pour signaler  des
+       anomalies       peuvent       être       trouvées      à      l’adresse
+       http://www.kernel.org/doc/man-pages/.
+
+TRADUCTION
+
+       Cette page de manuel a été traduite  et  mise  à  jour  par  Christophe
+       Blaess  <http://www.blaess.fr/christophe/> entre 1996 et 2003, puis par
+       Alain Portal <aportal AT univ-montp2 DOT fr> jusqu’en 2006, et  mise  à
+       disposition sur http://manpagesfr.free.fr/.
+
+       Les mises à jour et corrections de la version présente dans Debian sont
+       directement gérées par Julien Cristau <jcristau@debian.org> et l’équipe
+       francophone de traduction de Debian.
+
+       Veuillez   signaler   toute   erreur   de   traduction  en  écrivant  à
+       <debian-l10n-french@lists.debian.org> ou par un rapport de bogue sur le
+       paquet manpages-fr.
+
+       Vous  pouvez  toujours avoir accès à la version anglaise de ce document
+       en utilisant la commande « man -L C <section> <page_de_man> ».
+
