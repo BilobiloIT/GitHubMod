@@ -33,5 +33,9 @@
     ping: Envoie des paquets ICMP à une adresse pour tester la connectivité réseau.
 
 Commandes sans paramètres 
-man {commande} : sert à afficher les paramètres d'une commande exemple 
+man {commande} : sert à afficher les paramètres d'une commande 
+
+-----------
+
+exemple :
 man {ping} affiche le synopsis de la commande ainsi que la description de la commande
